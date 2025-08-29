@@ -169,9 +169,9 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
       {/* Team A */}
       <div className="team-a mb-3 p-4 rounded-lg">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 flex-1 mr-4">
-            <span className="text-sm font-semibold text-blue-800 whitespace-nowrap">Team A</span>
-            <div className="flex items-center space-x-2 ml-2">
+          <div className="flex items-center space-x-1 flex-1 mr-2">
+            <span className="text-xs font-medium text-blue-800 whitespace-nowrap">Team A</span>
+            <div className="flex items-center space-x-2 ml-1">
               <span className="player-button">
                 {getPlayerName(match.teamA.player1)}
               </span>
@@ -202,9 +202,9 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
       {/* Team B */}
       <div className="team-b mb-4 p-4 rounded-lg">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 flex-1 mr-4">
-            <span className="text-sm font-semibold text-red-800 whitespace-nowrap">Team B</span>
-            <div className="flex items-center space-x-2 ml-2">
+          <div className="flex items-center space-x-1 flex-1 mr-2">
+            <span className="text-xs font-medium text-red-800 whitespace-nowrap">Team B</span>
+            <div className="flex items-center space-x-2 ml-1">
               <span className="player-button bg-red-600">
                 {getPlayerName(match.teamB.player1)}
               </span>
