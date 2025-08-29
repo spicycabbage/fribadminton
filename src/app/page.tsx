@@ -12,7 +12,7 @@ export default function HomePage() {
             Badminton Tournament
           </h1>
           <p className="text-gray-600 text-sm">
-            Choose how you'd like to participate
+            Choose how you&apos;d like to participate
           </p>
         </div>
 

@@ -79,7 +79,7 @@ export default function JoinTournamentPage() {
               autoFocus
             />
             <p className="text-xs text-gray-500 mt-1 text-center">
-              Default access code is "111"
+              Default access code is &quot;111&quot;
             </p>
           </div>
 
@@ -106,7 +106,7 @@ export default function JoinTournamentPage() {
 
           {/* Help Text */}
           <div className="text-center text-sm text-gray-600">
-            <p className="mb-2">Don't have an access code?</p>
+            <p className="mb-2">Don&apos;t have an access code?</p>
             <Link href="/create-tournament" className="text-blue-600 underline font-medium">
               Create a new tournament instead
             </Link>

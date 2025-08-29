@@ -114,9 +114,9 @@ export default function TournamentPage() {
       <div className="mobile-container bg-blue-600 min-h-screen flex items-center justify-center">
         <div className="text-white text-xl text-center">
           <p>Tournament not found</p>
-          <a href="/" className="text-blue-200 underline mt-4 block">
+          <Link href="/" className="text-blue-200 underline mt-4 block">
             Return to Home
-          </a>
+          </Link>
         </div>
       </div>
     );
