@@ -26,8 +26,10 @@ export default function CreateTournamentPage() {
   }, [playerNames]);
 
   const handlePlayerNameChange = (index: number, value: string) => {
+    // Limit to 8 characters
+    const limitedValue = value.slice(0, 8);
     const newNames = [...playerNames];
-    newNames[index] = value;
+    newNames[index] = limitedValue;
     setPlayerNames(newNames);
     
     // Update suggestions for this input
@@ -131,7 +133,7 @@ export default function CreateTournamentPage() {
       <div className="bg-white mx-[4%] px-4 py-4">
         <div className="mb-4">
           <p className="text-sm text-gray-600 text-center">
-            Enter all 8 player names to start
+            Enter all 8 player names to start (max 8 characters each)
           </p>
         </div>
 
@@ -146,6 +148,7 @@ export default function CreateTournamentPage() {
                   type="text"
                   value={name}
                   onChange={(e) => handlePlayerNameChange(index, e.target.value)}
+                  maxLength={8}
                   onFocus={() => {
                     const newSuggestions = [...suggestions];
                     newSuggestions[index] = getFilteredSuggestions(name, index);

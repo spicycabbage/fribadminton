@@ -66,7 +66,7 @@ export const ROUND_MATCHUPS = [
 ];
 
 export const DEFAULT_PLAYER_NAMES = [
-  'Jason', 'Jason Ng', 'Mike', 'Kim', 'Alex', 'Ray', 'Steven', 'Josh',
+  'Jason', 'JasonNg', 'Mike', 'Kim', 'Alex', 'Ray', 'Steven', 'Josh',
   'Justin', 'Stevie', 'Eddie', 'Yorkie', 'Tonny', 'Wilson', 'Victor',
   'Ian', 'Trevor', 'Jim', 'Peter', 'Ben', 'Andrew', 'Dan', 'Yves', 'Brian'
 ];
