@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { Tournament, updateMatchScore, isTournamentComplete } from '@/lib/gameLogic';
 import TournamentHeader from '@/components/TournamentHeader';
 import PlayersTab from '@/components/PlayersTab';
