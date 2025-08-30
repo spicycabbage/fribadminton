@@ -53,7 +53,7 @@
   white-space: nowrap;
   font-size: 0.625rem;
   line-height: 1rem;
-  max-width: 60px;
+  max-width: 80px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
