@@ -39,10 +39,12 @@ export default function TournamentPage() {
     if (!tournament) return;
 
     const updatedTournament = updateMatchScore(tournament, matchId, scoreA, scoreB, isEdit);
-    setTournament(updatedTournament);
     
-    // Save to localStorage
+    // CRITICAL: Save to localStorage FIRST before any UI updates
     localStorage.setItem('currentTournament', JSON.stringify(updatedTournament));
+    
+    // Then update the UI state
+    setTournament(updatedTournament);
 
     // Only auto-advance if this is NOT an edit and we're on the matches tab
     if (!isEdit && activeTab === 'matches') {
@@ -55,8 +57,11 @@ export default function TournamentPage() {
       const wasJustCompleted = updatedMatch?.completed && !tournament.matches.find(m => m.id === matchId)?.completed;
 
       if (currentRoundComplete && wasJustCompleted) {
-        // Wait 1 second to show completed state, then proceed
+        // Wait 1.5 seconds to show completed state, then proceed
         setTimeout(() => {
+          // Force another save to be absolutely sure
+          localStorage.setItem('currentTournament', JSON.stringify(updatedTournament));
+          
           if (updatedTournament.currentRound === 7) {
             // Tournament complete - go to rank tab
             setActiveTab('rank');
@@ -65,7 +70,7 @@ export default function TournamentPage() {
             // Force re-render by updating the tournament state
             setTournament({...updatedTournament});
           }
-        }, 1000);
+        }, 1500);
       }
     }
   };
