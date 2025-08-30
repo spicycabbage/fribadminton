@@ -41,7 +41,8 @@ export default function MatchesTab({ tournament, onScoreUpdate }: MatchesTabProp
   );
 
   return (
-    <div className="p-4">
+    <div className="p-4 w-full max-w-full">
+      <div className="w-full">
       {/* Round Navigation */}
       <div className="flex items-center justify-center mb-6">
         <button
@@ -102,6 +103,7 @@ export default function MatchesTab({ tournament, onScoreUpdate }: MatchesTabProp
             onScoreUpdate={onScoreUpdate}
           />
         ))}
+      </div>
       </div>
     </div>
   );

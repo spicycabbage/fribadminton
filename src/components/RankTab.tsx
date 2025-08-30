@@ -40,7 +40,8 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
   // Always show rankings, but with different headers for in-progress vs complete
 
   return (
-    <div className="p-4 min-w-full">
+    <div className="p-4 w-full max-w-full">
+      <div className="w-full">
         {/* Rankings Header */}
         <div className="text-center mb-6">
           <h3 className="text-xl font-bold mb-2">
@@ -148,6 +149,7 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
           </button>
         </Link>
         </div>
+      </div>
     </div>
   );
 }

@@ -42,7 +42,8 @@ export default function PlayersTab({ players, onUpdatePlayers, isFinalized }: Pl
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 w-full max-w-full">
+      <div className="w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
@@ -132,6 +133,7 @@ export default function PlayersTab({ players, onUpdatePlayers, isFinalized }: Pl
           <p>All player names must be filled and unique.</p>
         </div>
       )}
+      </div>
     </div>
   );
 }
