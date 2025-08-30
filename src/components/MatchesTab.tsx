@@ -44,7 +44,7 @@ export default function MatchesTab({ tournament, onScoreUpdate }: MatchesTabProp
     <div className="p-4 w-full max-w-full">
       <div className="w-full">
       {/* Round Navigation */}
-      <div className="flex items-center justify-center mb-6">
+      <div className="flex items-center justify-center mb-4">
         <button
           onClick={() => selectedRound > 1 && setSelectedRound(selectedRound - 1)}
           disabled={selectedRound === 1}
@@ -89,8 +89,8 @@ export default function MatchesTab({ tournament, onScoreUpdate }: MatchesTabProp
         </button>
       </div>
 
-      <div className="text-center mb-6">
-        <h3 className="text-xl font-bold">Round {selectedRound}</h3>
+      <div className="text-center mb-3">
+        <h3 className="text-lg font-bold">Round {selectedRound}</h3>
       </div>
 
       {/* Matches */}
