@@ -61,7 +61,7 @@ export default function CreateTournamentPage() {
     
     return DEFAULT_PLAYER_NAMES
       .filter(name => 
-        name.toLowerCase().includes(currentValue.toLowerCase()) &&
+        name.toLowerCase().startsWith(currentValue.toLowerCase()) &&
         !usedNames.includes(name.toLowerCase())
       )
       .slice(0, 3);
