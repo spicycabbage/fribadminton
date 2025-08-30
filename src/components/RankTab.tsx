@@ -40,7 +40,7 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
   // Always show rankings, but with different headers for in-progress vs complete
 
   return (
-    <div className="p-4">
+    <div className="p-4 min-w-full">
         {/* Rankings Header */}
         <div className="text-center mb-6">
           <h3 className="text-xl font-bold mb-2">
@@ -52,11 +52,11 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
         </div>
 
         {/* Rankings List */}
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3 mb-6 w-full">
           {rankedPlayers.map((player, index) => (
             <div
               key={player.id}
-              className={`flex items-center justify-between h-14 px-4 rounded-lg ${
+              className={`flex items-center justify-between h-14 px-6 py-3 rounded-lg ${
                 index === 0 
                   ? 'bg-yellow-50 border-2 border-yellow-300' 
                   : 'bg-gray-50 border border-gray-200'
@@ -94,9 +94,10 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
 
         {/* Score Details */}
         {showScoreDetails && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-6 overflow-x-auto">
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
             <h4 className="font-bold mb-4 text-center">Round Scores</h4>
-            <div className="min-w-full">
+            <div className="overflow-x-auto">
+              <div className="min-w-[600px]">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b">
@@ -125,13 +126,13 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         )}
-      </div>
 
-      {/* Bottom Actions */}
-      <div className="p-4 border-t bg-white space-y-3">
+        {/* Bottom Actions */}
+        <div className="mt-6 space-y-3">
         {isComplete && !tournament.isFinalized && (
           <button
             onClick={onFinalize}
@@ -146,6 +147,7 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
             Return to Home Screen
           </button>
         </Link>
+        </div>
     </div>
   );
 }
