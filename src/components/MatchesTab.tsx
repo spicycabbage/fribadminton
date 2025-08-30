@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Tournament, Match, validateScore } from '@/lib/gameLogic';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+
 
 interface MatchesTabProps {
   tournament: Tournament;
@@ -45,15 +45,7 @@ export default function MatchesTab({ tournament, onScoreUpdate }: MatchesTabProp
       <div className="w-full">
       {/* Round Navigation */}
       <div className="flex items-center justify-center mb-4">
-        <button
-          onClick={() => selectedRound > 1 && setSelectedRound(selectedRound - 1)}
-          disabled={selectedRound === 1}
-          className="p-2 disabled:opacity-30"
-        >
-          <ChevronLeftIcon className="w-5 h-5" />
-        </button>
-
-        <div className="flex mx-4">
+        <div className="flex">
           {[1, 2, 3, 4, 5, 6, 7].map((round) => {
             const status = getRoundStatus(round);
             const isSelected = round === selectedRound;
@@ -79,14 +71,6 @@ export default function MatchesTab({ tournament, onScoreUpdate }: MatchesTabProp
             );
           })}
         </div>
-
-        <button
-          onClick={() => selectedRound < 7 && setSelectedRound(selectedRound + 1)}
-          disabled={selectedRound === 7}
-          className="p-2 disabled:opacity-30"
-        >
-          <ChevronRightIcon className="w-5 h-5" />
-        </button>
       </div>
 
       <div className="text-center mb-3">
