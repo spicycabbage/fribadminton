@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Tournament, updateMatchScore, isTournamentComplete } from '@/lib/gameLogic';
@@ -18,6 +18,11 @@ export default function TournamentPage() {
   const [activeTab, setActiveTab] = useState<TabType>('matches');
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
+  const latestTournamentRef = useRef<Tournament | null>(null);
+
+  useEffect(() => {
+    latestTournamentRef.current = tournament;
+  }, [tournament]);
 
   useEffect(() => {
     // Use requestAnimationFrame for smoother loading
@@ -40,8 +45,21 @@ export default function TournamentPage() {
           });
           socket.on('toast:score', (payload: any) => {
             if (payload && typeof payload === 'object') {
-              const { round, scoreA, scoreB } = payload;
-              setToast(`Scores updated for Round ${round}: ${scoreA}-${scoreB}`);
+              const { round, scoreA, scoreB, matchId } = payload as any;
+
+              const base = latestTournamentRef.current || parsedTournament;
+              let msg = `Scores updated for Round ${round}: ${scoreA}-${scoreB}`;
+              try {
+                const match = base?.matches.find((m: any) => m.id === matchId);
+                const getName = (id: number) => base?.players.find((p: any) => p.id === id)?.name || `P${id}`;
+                if (match) {
+                  const teamA = `${getName(match.teamA.player1)}-${getName(match.teamA.player2)}`;
+                  const teamB = `${getName(match.teamB.player1)}-${getName(match.teamB.player2)}`;
+                  msg = `Round ${round}: ${teamA} vs ${teamB} — ${scoreA}-${scoreB}`;
+                }
+              } catch {}
+
+              setToast(msg);
               setTimeout(() => setToast(null), 3000);
             }
           });
