@@ -80,39 +80,32 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
           ))}
         </div>
 
-        {/* Score Details - Always visible with all 7 rounds */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <h4 className="font-bold mb-4 text-center">Round Scores</h4>
-          <div className="overflow-x-auto">
-            <div className="min-w-[600px]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2 pr-2 font-semibold">Player</th>
-                  {[1, 2, 3, 4, 5, 6, 7].map(round => (
-                    <th key={round} className="text-center py-2 px-1 font-semibold">
-                      R{round}
-                    </th>
+        {/* Score Details - Always visible with all 7 rounds, no horizontal scroll */}
+        <div className="bg-gray-50 rounded-lg p-3 mb-6">
+          <h4 className="font-bold mb-3 text-center">Round Scores</h4>
+          <div className="text-[11px]">
+            <div className="grid grid-cols-[minmax(0,1fr)_repeat(7,2rem)_2.5rem] items-center font-semibold border-b pb-1">
+              <div className="pr-1">Player</div>
+              {[1, 2, 3, 4, 5, 6, 7].map((round) => (
+                <div key={round} className="text-center">R{round}</div>
+              ))}
+              <div className="text-center">Total</div>
+            </div>
+            <div>
+              {rankedPlayers.map((player) => (
+                <div
+                  key={player.id}
+                  className="grid grid-cols-[minmax(0,1fr)_repeat(7,2rem)_2.5rem] items-center border-b py-1"
+                >
+                  <div className="truncate pr-1 font-medium">{player.name}</div>
+                  {[0, 1, 2, 3, 4, 5, 6].map((roundIndex) => (
+                    <div key={roundIndex} className="text-center">
+                      {player.scores[roundIndex] || '-'}
+                    </div>
                   ))}
-                  <th className="text-center py-2 pl-2 font-semibold">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rankedPlayers.map((player) => (
-                  <tr key={player.id} className="border-b">
-                    <td className="py-2 pr-2 font-medium">{player.name}</td>
-                    {[0,1,2,3,4,5,6].map((roundIndex) => (
-                      <td key={roundIndex} className="text-center py-2 px-1">
-                        {player.scores[roundIndex] || '-'}
-                      </td>
-                    ))}
-                    <td className="text-center py-2 pl-2 font-bold">
-                      {player.totalScore}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  <div className="text-center font-bold">{player.totalScore}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
