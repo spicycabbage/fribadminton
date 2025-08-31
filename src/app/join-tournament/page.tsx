@@ -28,9 +28,9 @@ export default function JoinTournamentPage() {
       const socket = getSocket();
 
       const timeoutId = setTimeout(() => {
-        setError('No active tournament found yet. Still waking the live server or waiting for the organizer. Try again in ~1 min.');
+        setError("There are no active tournament. Why don't you create one?");
         setLoading(false);
-      }, 90000);
+      }, 8000);
 
       socket.once('tournament:sync', (serverTournament: any) => {
         if (!serverTournament || serverTournament.accessCode !== accessCode) {
