@@ -1,0 +1,10 @@
+[33m938790a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Double bottom padding to pb-16 for better button visibility
+[33m0d6426e[m Add extra bottom padding to Players and Matches tabs for full button visibility
+[33m6a592fa[m ACTUALLY make circles smaller - they were cut off screen
+[33mc4a7413[m Make round circles 5% smaller to fit in frame
+[33mb5f37ad[m Fix chopped off tabs: Allow scrolling in Matches and Players tabs
+[33m31639a0[m Use 100dvh and remove safe-area padding from tournament screens
+[33m44fab43[m ACTUAL FIX: Add box-sizing border-box to include padding in height
+[33m165a9c8[m Force tournament screen height with !important
+[33me62845a[m Waterfall fix: Single CSS class solution for screen heights
+[33m240c1e4[m ACTUALLY fix chopped off registration - remove overflow hidden from CSS

@@ -62,7 +62,7 @@ export default function TournamentPage() {
           // Force another save to be absolutely sure
           localStorage.setItem('currentTournament', JSON.stringify(updatedTournament));
           
-          if (updatedTournament.currentRound === 7) {
+          if (updatedTournament.currentRound === 7 && currentRoundComplete) {
             // Tournament complete - go to rank tab
             setActiveTab('rank');
           } else {
