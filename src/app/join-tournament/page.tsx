@@ -8,7 +8,7 @@ import { ChevronLeftIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
 export default function JoinTournamentPage() {
   const router = useRouter();
-  const [accessCode, setAccessCode] = useState('111');
+  const [accessCode, setAccessCode] = useState('123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -17,33 +17,27 @@ export default function JoinTournamentPage() {
     setError('');
 
     try {
-      // Check if there's a current tournament with matching access code
-      const storedTournament = localStorage.getItem('currentTournament');
-      
-      if (!storedTournament) {
-        setError('No active tournament found. Please check the access code or create a new tournament.');
+      const socket = getSocket();
+
+      const timeoutId = setTimeout(() => {
+        setError('No active tournament found for this access code. Make sure the organizer has created it and you typed the code correctly.');
         setLoading(false);
-        return;
-      }
+      }, 6000);
 
-      const tournament = JSON.parse(storedTournament);
-      
-      if (tournament.accessCode !== accessCode) {
-        setError('Invalid access code. Please check with the tournament organizer.');
-        setLoading(false);
-        return;
-      }
+      socket.once('tournament:sync', (serverTournament: any) => {
+        if (!serverTournament || serverTournament.accessCode !== accessCode) {
+          return;
+        }
+        clearTimeout(timeoutId);
+        try {
+          localStorage.setItem('currentTournament', JSON.stringify(serverTournament));
+        } catch {}
+        router.push(`/tournament/${serverTournament.id}`);
+      });
 
-      // Successfully joined - broadcast intent and redirect to tournament
-      try {
-        const socket = getSocket();
-        socket.emit('join-tournament', tournament.accessCode);
-      } catch(_) {}
-
-      // Redirect to tournament
-      router.push(`/tournament/${tournament.id}`);
+      socket.emit('join-tournament', accessCode);
     } catch (err) {
-      setError('Error joining tournament. Please try again.');
+      setError('Real-time server unavailable. Please try again in a moment.');
       setLoading(false);
     }
   };
@@ -86,7 +80,7 @@ export default function JoinTournamentPage() {
               autoFocus
             />
             <p className="text-xs text-gray-500 mt-1 text-center">
-              Default access code is &quot;111&quot;
+              Make sure this matches the organizer’s access code.
             </p>
           </div>
 
