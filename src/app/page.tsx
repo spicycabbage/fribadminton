@@ -9,11 +9,8 @@ export default function HomePage() {
       <div className="tournament-card w-[92%] mb-6">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Badminton Tournament
+            Friday Badminton
           </h1>
-          <p className="text-gray-600 text-sm">
-            Choose how you&apos;d like to participate
-          </p>
         </div>
 
         <div className="space-y-4">
@@ -37,13 +34,9 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Tournament History & Analytics Section */}
+      {/* Tournament History Section */}
       <div className="tournament-card w-[92%]">
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-2">
-            Tournament History & Analytics
-          </h2>
-        </div>
+        {/* Removed section title per request */}
 
         <div className="space-y-3">
           <Link 
