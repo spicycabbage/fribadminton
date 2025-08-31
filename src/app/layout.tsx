@@ -5,13 +5,13 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Badminton Tournament Scorer',
-  description: 'Mobile scoring app for doubles badminton tournaments',
+  title: 'Friday Badminton App',
+  description: 'Mobile scoring app for Friday Badminton tournaments',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Badminton Scorer',
+    title: 'Friday Badminton App',
   },
 }
 

@@ -1,6 +1,6 @@
 {
-  "name": "Badminton Tournament Scorer",
-  "short_name": "BadmintonScore",
+  "name": "Friday Badminton App",
+  "short_name": "Friday Badminton",
   "description": "Mobile PWA for scoring doubles badminton tournaments with 8 players across 7 rounds",
   "start_url": "/",
   "display": "standalone",
