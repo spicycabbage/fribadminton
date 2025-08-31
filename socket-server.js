@@ -52,11 +52,27 @@ io.on('connection', (socket) => {
   });
 
   // Client sends updated tournament snapshot after a score update
-  socket.on('tournament:update', (tournament) => {
+  // Accepts either (tournament) or ({ tournament, update }) where update carries match info
+  socket.on('tournament:update', (payload) => {
+    const tournament = payload?.tournament ?? payload;
     if (!tournament || !tournament.id || !tournament.accessCode) return;
     accessCodeToTournament.set(tournament.accessCode, tournament);
     tournamentIdToAccessCode.set(tournament.id, tournament.accessCode);
-    io.to(getRoomName(tournament.id)).emit('tournament:sync', tournament);
+
+    const room = getRoomName(tournament.id);
+    io.to(room).emit('tournament:sync', tournament);
+
+    // Broadcast a toast to everyone EXCEPT the sender if we have update info
+    const update = payload?.update;
+    if (update && typeof update === 'object') {
+      socket.to(room).emit('toast:score', {
+        matchId: update.matchId,
+        round: update.round,
+        scoreA: update.scoreA,
+        scoreB: update.scoreB,
+        ts: Date.now(),
+      });
+    }
   });
 });
 

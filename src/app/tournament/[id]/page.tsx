@@ -17,6 +17,7 @@ export default function TournamentPage() {
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('matches');
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     // Use requestAnimationFrame for smoother loading
@@ -35,6 +36,13 @@ export default function TournamentPage() {
             if (serverTournament?.id === parsedTournament.id) {
               localStorage.setItem('currentTournament', JSON.stringify(serverTournament));
               setTournament(serverTournament);
+            }
+          });
+          socket.on('toast:score', (payload: any) => {
+            if (payload && typeof payload === 'object') {
+              const { round, scoreA, scoreB } = payload;
+              setToast(`Scores updated for Round ${round}: ${scoreA}-${scoreB}`);
+              setTimeout(() => setToast(null), 3000);
             }
           });
         } catch (_) {
@@ -64,7 +72,16 @@ export default function TournamentPage() {
     // Broadcast to all viewers (creator, joiners, spectators)
     try {
       const socket = getSocket();
-      socket.emit('tournament:update', updatedTournament);
+      const match = updatedTournament.matches.find(m => m.id === matchId);
+      socket.emit('tournament:update', {
+        tournament: updatedTournament,
+        update: match ? {
+          matchId: match.id,
+          round: match.round,
+          scoreA,
+          scoreB
+        } : undefined
+      });
     } catch (_) {
       // ignore if socket not available
     }
@@ -157,7 +174,7 @@ export default function TournamentPage() {
   }
 
   return (
-    <div className="mobile-container bg-blue-600 min-h-screen safe-area-inset-top safe-area-inset-bottom">
+    <div className="mobile-container bg-blue-600 min-h-screen safe-area-inset-top safe-area-inset-bottom relative">
       <TournamentHeader 
         date={tournament.date}
         accessCode={tournament.accessCode}
@@ -188,6 +205,12 @@ export default function TournamentPage() {
           />
         )}
       </div>
+
+      {toast && (
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-6 bg-black text-white px-4 py-2 rounded-lg text-sm shadow-lg animate-fade-in-out">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }
