@@ -46,7 +46,7 @@ export default function JoinTournamentPage() {
       socket.once('join:error', (payload: any) => {
         clearTimeout(timeoutId);
         if (payload?.reason === 'finalized') {
-          setError('This tournament has been finalized. View it under Tournament Results.');
+          setError("There are no active tournament. Why don't you create one?");
         } else {
           setError('Unable to join this tournament right now.');
         }
