@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Tournament, updateMatchScore, isTournamentComplete } from '@/lib/gameLogic';
+import { getSocket } from '@/lib/socket';
 import TournamentHeader from '@/components/TournamentHeader';
 import PlayersTab from '@/components/PlayersTab';
 import MatchesTab from '@/components/MatchesTab';
@@ -25,6 +26,20 @@ export default function TournamentPage() {
       if (storedTournament) {
         const parsedTournament = JSON.parse(storedTournament);
         setTournament(parsedTournament);
+        // Join live updates for this tournament
+        try {
+          const socket = getSocket();
+          socket.emit('join-tournament', parsedTournament.accessCode);
+          socket.on('tournament:sync', (serverTournament: Tournament) => {
+            // Only accept updates for this tournament id
+            if (serverTournament?.id === parsedTournament.id) {
+              localStorage.setItem('currentTournament', JSON.stringify(serverTournament));
+              setTournament(serverTournament);
+            }
+          });
+        } catch (_) {
+          // socket init failed in this environment; silently ignore
+        }
         
         // If tournament is complete, show rank tab
         if (isTournamentComplete(parsedTournament)) {
@@ -45,6 +60,14 @@ export default function TournamentPage() {
     
     // Then update the UI state
     setTournament(updatedTournament);
+
+    // Broadcast to all viewers (creator, joiners, spectators)
+    try {
+      const socket = getSocket();
+      socket.emit('tournament:update', updatedTournament);
+    } catch (_) {
+      // ignore if socket not available
+    }
 
     // Only auto-advance if this is NOT an edit and we're on the matches tab
     if (!isEdit && activeTab === 'matches') {

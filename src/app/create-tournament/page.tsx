@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeftIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { DEFAULT_PLAYER_NAMES, createTournament } from '@/lib/gameLogic';
+import { getSocket } from '@/lib/socket';
 
 export default function CreateTournamentPage() {
   const router = useRouter();
@@ -77,6 +78,12 @@ export default function CreateTournamentPage() {
         
         // Store tournament in localStorage for now (later will use real-time DB)
         localStorage.setItem('currentTournament', JSON.stringify(tournament));
+        
+        // Announce the created tournament and join its room
+        try {
+          const socket = getSocket();
+          socket.emit('create-tournament', tournament);
+        } catch(_) {}
         
         // Navigate to tournament screen
         router.push(`/tournament/${tournament.id}`);

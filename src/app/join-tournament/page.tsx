@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getSocket } from '@/lib/socket';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeftIcon, UserGroupIcon } from '@heroicons/react/24/outline';
@@ -33,7 +34,13 @@ export default function JoinTournamentPage() {
         return;
       }
 
-      // Successfully joined - redirect to tournament
+      // Successfully joined - broadcast intent and redirect to tournament
+      try {
+        const socket = getSocket();
+        socket.emit('join-tournament', tournament.accessCode);
+      } catch(_) {}
+
+      // Redirect to tournament
       router.push(`/tournament/${tournament.id}`);
     } catch (err) {
       setError('Error joining tournament. Please try again.');
