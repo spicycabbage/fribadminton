@@ -35,7 +35,9 @@ export default function TournamentPage() {
         // Join live updates for this tournament
         try {
           const socket = getSocket();
-          socket.emit('join-tournament', parsedTournament.accessCode);
+          const joinRoom = () => socket.emit('join-tournament', parsedTournament.accessCode);
+          joinRoom();
+          socket.io.on('reconnect', joinRoom);
           socket.on('tournament:sync', (serverTournament: Tournament) => {
             // Only accept updates for this tournament id
             if (serverTournament?.id === parsedTournament.id) {
