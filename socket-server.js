@@ -46,6 +46,10 @@ io.on('connection', (socket) => {
   socket.on('join-tournament', (accessCode) => {
     const tournament = accessCodeToTournament.get(accessCode);
     if (!tournament) return; // Client should retry or show error
+    if (tournament.isFinalized) {
+      socket.emit('join:error', { reason: 'finalized' });
+      return;
+    }
     const room = getRoomName(tournament.id);
     socket.join(room);
     socket.emit('tournament:sync', tournament);

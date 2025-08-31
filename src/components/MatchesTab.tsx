@@ -232,7 +232,7 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
       )}
 
       {/* Submit Button */}
-      {(!isCompleted || isEditing) && (
+      {(!isCompleted || isEditing) && !tournament.isFinalized && (
         <div className="space-y-2">
           <button
             onClick={handleSubmit}
@@ -257,7 +257,7 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
         </div>
       )}
 
-      {isCompleted && !isEditing && (
+      {isCompleted && !isEditing && !tournament.isFinalized && (
         <div className="flex items-center justify-between w-full py-3 bg-green-500 text-white rounded-lg font-semibold">
           <button
             onClick={handleEdit}
@@ -271,6 +271,9 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
           <span className="flex-1 text-center">✓ Match Completed</span>
           <div className="w-8"></div> {/* Spacer for centering */}
         </div>
+      )}
+      {tournament.isFinalized && (
+        <div className="w-full py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold text-center">Tournament Finalized</div>
       )}
     </div>
   );

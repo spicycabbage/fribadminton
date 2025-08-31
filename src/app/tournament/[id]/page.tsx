@@ -81,6 +81,7 @@ export default function TournamentPage() {
   const handleScoreUpdate = (matchId: number, scoreA: number, scoreB: number, isEdit: boolean = false) => {
     if (!tournament) return;
 
+    if (tournament.isFinalized) return; // guard: no updates after finalize
     const updatedTournament = updateMatchScore(tournament, matchId, scoreA, scoreB, isEdit);
     
     // CRITICAL: Save to localStorage FIRST before any UI updates

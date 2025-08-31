@@ -43,6 +43,16 @@ export default function JoinTournamentPage() {
         router.push(`/tournament/${serverTournament.id}`);
       });
 
+      socket.once('join:error', (payload: any) => {
+        clearTimeout(timeoutId);
+        if (payload?.reason === 'finalized') {
+          setError('This tournament has been finalized. View it under Tournament Results.');
+        } else {
+          setError('Unable to join this tournament right now.');
+        }
+        setLoading(false);
+      });
+
       socket.emit('join-tournament', accessCode);
     } catch (err) {
       setError('Real-time server unavailable. Please try again in a moment.');
