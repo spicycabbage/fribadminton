@@ -35,13 +35,13 @@ export default function TournamentResultsPage() {
   }, []);
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
+    // dateString is stored as YYYY-MM-DD; parse as LOCAL date to avoid timezone shift
+    const [y, m, d] = dateString.split('-').map(Number);
+    const local = new Date(y, (m || 1) - 1, d || 1);
+    return local.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'short', 
+      month: 'short',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
     });
   };
 
