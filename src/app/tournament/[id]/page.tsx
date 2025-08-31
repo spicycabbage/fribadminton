@@ -167,6 +167,12 @@ export default function TournamentPage() {
     setTournament(finalizedTournament);
     localStorage.setItem('currentTournament', JSON.stringify(finalizedTournament));
 
+    // Broadcast finalization so all clients lock immediately
+    try {
+      const socket = getSocket();
+      socket.emit('tournament:update', finalizedTournament);
+    } catch {}
+
     // Save to tournament history
     const history = JSON.parse(localStorage.getItem('tournamentHistory') || '[]');
     history.push(finalizedTournament);

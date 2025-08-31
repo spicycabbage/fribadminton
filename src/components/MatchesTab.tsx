@@ -109,6 +109,7 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
   const [scoreB, setScoreB] = useState(match.scoreB?.toString() || '');
   const [showValidation, setShowValidation] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const isLocked = tournament.isFinalized;
 
   const getPlayerName = useCallback((playerId: number) => {
     return tournament.players.find(p => p.id === playerId)?.name || `P${playerId}`;
@@ -173,7 +174,7 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
             </div>
           </div>
           <div className="text-3xl font-bold text-right w-[80px] flex-shrink-0">
-            {isCompleted && !isEditing ? match.scoreA : (
+            {isLocked || (isCompleted && !isEditing) ? (match.scoreA ?? '-') : (
               <input
                 type="number"
                 value={scoreA}
@@ -184,6 +185,7 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
                 inputMode="numeric"
                 autoComplete="off"
                 placeholder="0"
+                disabled={isLocked}
               />
             )}
           </div>
@@ -206,7 +208,7 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
             </div>
           </div>
           <div className="text-3xl font-bold text-right w-[80px] flex-shrink-0">
-            {isCompleted && !isEditing ? match.scoreB : (
+            {isLocked || (isCompleted && !isEditing) ? (match.scoreB ?? '-') : (
               <input
                 type="number"
                 value={scoreB}
@@ -217,6 +219,7 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
                 inputMode="numeric"
                 autoComplete="off"
                 placeholder="0"
+                disabled={isLocked}
               />
             )}
           </div>
@@ -224,7 +227,7 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
       </div>
 
       {/* Validation Message */}
-      {showValidation && (
+      {showValidation && !isLocked && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 rounded text-red-700 text-sm">
           <p className="font-semibold">Invalid Score!</p>
           <p>One team must score exactly 21 points, the other must score less than 21.</p>
