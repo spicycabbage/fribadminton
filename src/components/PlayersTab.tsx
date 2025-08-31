@@ -57,11 +57,7 @@ export default function PlayersTab({ players, onUpdatePlayers, isFinalized }: Pl
         </div>
       </div>
 
-      {!isEditing && (
-        <div className="mb-4 text-center">
-          <p className="text-gray-600 text-sm mb-4">Update player names</p>
-        </div>
-      )}
+      {/* Removed instructional text per request */}
 
       {/* Player List */}
       <div className="space-y-3 mb-6">
@@ -102,7 +98,7 @@ export default function PlayersTab({ players, onUpdatePlayers, isFinalized }: Pl
             }`}
           >
             <PencilIcon className="w-5 h-5 inline mr-2" />
-            {isFinalized ? 'Tournament Finalized' : 'Update Tournament'}
+            {isFinalized ? 'Tournament Finalized' : 'Update Players'}
           </button>
         ) : (
           <div className="space-y-3">

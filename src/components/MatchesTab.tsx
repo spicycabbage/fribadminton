@@ -11,15 +11,15 @@ interface MatchesTabProps {
 
 export default function MatchesTab({ tournament, onScoreUpdate }: MatchesTabProps) {
   const [selectedRound, setSelectedRound] = useState(tournament.currentRound);
+  const [autoFollow, setAutoFollow] = useState(true);
 
   // Update selected round when tournament current round changes, but only if we're not editing
   useEffect(() => {
-    // Don't auto-switch rounds if user is manually viewing a different round
-    // Only auto-switch if we're currently on the tournament's current round
-    if (selectedRound === tournament.currentRound - 1 || selectedRound === tournament.currentRound) {
+    // Auto-follow the tournament's current round only when user hasn't navigated manually
+    if (autoFollow) {
       setSelectedRound(tournament.currentRound);
     }
-  }, [tournament.currentRound, selectedRound]);
+  }, [tournament.currentRound, autoFollow]);
 
   const getRoundStatus = useCallback((round: number) => {
     const roundMatches = tournament.matches.filter(m => m.round === round);
@@ -54,7 +54,12 @@ export default function MatchesTab({ tournament, onScoreUpdate }: MatchesTabProp
             return (
               <button
                 key={round}
-                onClick={() => canSelect && setSelectedRound(round)}
+                onClick={() => {
+                  if (!canSelect) return;
+                  setSelectedRound(round);
+                  // Disable auto-follow if the user navigates away from the live current round
+                  setAutoFollow(round === tournament.currentRound);
+                }}
                 disabled={!canSelect}
                 className={`round-button ${
                   isSelected 
