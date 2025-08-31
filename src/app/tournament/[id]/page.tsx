@@ -73,6 +73,11 @@ export default function TournamentPage() {
         }, 1500);
       }
     }
+
+    // Fallback: If all matches are completed, make sure we switch to Rank tab
+    if (activeTab === 'matches' && isTournamentComplete(updatedTournament)) {
+      setActiveTab('rank');
+    }
   };
 
   const handlePlayerUpdate = (updatedPlayers: string[]) => {
