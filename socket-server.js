@@ -12,7 +12,10 @@ const accessCodeToTournament = new Map();
 const tournamentIdToAccessCode = new Map();
 
 const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.writeHead(200, {
+    'Content-Type': 'text/plain',
+    'Access-Control-Allow-Origin': '*',
+  });
   res.end('Socket server is running.\n');
 });
 

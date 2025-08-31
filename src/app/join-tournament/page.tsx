@@ -17,12 +17,20 @@ export default function JoinTournamentPage() {
     setError('');
 
     try {
+      // Pre-wake the Render free instance (no-cors to avoid CORS blocking)
+      try {
+        const pingUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+        if (pingUrl) {
+          fetch(pingUrl, { method: 'GET', mode: 'no-cors', cache: 'no-store' }).catch(() => {});
+        }
+      } catch {}
+
       const socket = getSocket();
 
       const timeoutId = setTimeout(() => {
-        setError('No active tournament found for this access code. Make sure the organizer has created it and you typed the code correctly.');
+        setError('No active tournament found yet. Still waking the live server or waiting for the organizer. Try again in ~1 min.');
         setLoading(false);
-      }, 6000);
+      }, 90000);
 
       socket.once('tournament:sync', (serverTournament: any) => {
         if (!serverTournament || serverTournament.accessCode !== accessCode) {
