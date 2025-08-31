@@ -14,12 +14,14 @@ export default function TournamentHeader({
   onTabChange 
 }: TournamentHeaderProps) {
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    // Parse YYYY-MM-DD as a local date to avoid timezone shifting to previous day
+    const [y, m, d] = dateString.split('-').map(Number);
+    const local = new Date(y, (m || 1) - 1, d || 1);
+    return local.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 

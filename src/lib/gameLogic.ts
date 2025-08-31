@@ -105,7 +105,14 @@ export function createTournament(accessCode: string, playerNames: string[]): Tou
   return {
     id: generateTournamentId(),
     accessCode,
-    date: new Date().toISOString().split('T')[0],
+    // Store date as local YYYY-MM-DD to avoid timezone shifts later
+    date: (() => {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    })(),
     players,
     matches,
     currentRound: 1,
