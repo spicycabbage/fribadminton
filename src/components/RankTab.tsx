@@ -1,6 +1,4 @@
 'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 import { Tournament, getRankedPlayers, isTournamentComplete } from '@/lib/gameLogic';
 import { TrophyIcon, UserIcon } from '@heroicons/react/24/solid';
@@ -11,7 +9,6 @@ interface RankTabProps {
 }
 
 export default function RankTab({ tournament, onFinalize }: RankTabProps) {
-  const [showScoreDetails, setShowScoreDetails] = useState(false);
   const rankedPlayers = getRankedPlayers(tournament);
   const isComplete = isTournamentComplete(tournament);
 
@@ -83,54 +80,42 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
           ))}
         </div>
 
-        {/* Toggle Score Details */}
-        <div className="text-center mb-4">
-          <button
-            onClick={() => setShowScoreDetails(!showScoreDetails)}
-            className="text-blue-600 underline font-medium"
-          >
-            {showScoreDetails ? 'Hide' : 'Show'} Round Scores
-          </button>
-        </div>
-
-        {/* Score Details */}
-        {showScoreDetails && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h4 className="font-bold mb-4 text-center">Round Scores</h4>
-            <div className="overflow-x-auto">
-              <div className="min-w-[600px]">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2 pr-2 font-semibold">Player</th>
-                    {[1, 2, 3, 4, 5, 6, 7].map(round => (
-                      <th key={round} className="text-center py-2 px-1 font-semibold">
-                        R{round}
-                      </th>
-                    ))}
-                    <th className="text-center py-2 pl-2 font-semibold">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rankedPlayers.map((player) => (
-                    <tr key={player.id} className="border-b">
-                      <td className="py-2 pr-2 font-medium">{player.name}</td>
-                      {player.scores.map((score, roundIndex) => (
-                        <td key={roundIndex} className="text-center py-2 px-1">
-                          {score || '-'}
-                        </td>
-                      ))}
-                      <td className="text-center py-2 pl-2 font-bold">
-                        {player.totalScore}
-                      </td>
-                    </tr>
+        {/* Score Details - Always visible with all 7 rounds */}
+        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <h4 className="font-bold mb-4 text-center">Round Scores</h4>
+          <div className="overflow-x-auto">
+            <div className="min-w-[600px]">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 pr-2 font-semibold">Player</th>
+                  {[1, 2, 3, 4, 5, 6, 7].map(round => (
+                    <th key={round} className="text-center py-2 px-1 font-semibold">
+                      R{round}
+                    </th>
                   ))}
-                </tbody>
-              </table>
-              </div>
+                  <th className="text-center py-2 pl-2 font-semibold">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rankedPlayers.map((player) => (
+                  <tr key={player.id} className="border-b">
+                    <td className="py-2 pr-2 font-medium">{player.name}</td>
+                    {[0,1,2,3,4,5,6].map((roundIndex) => (
+                      <td key={roundIndex} className="text-center py-2 px-1">
+                        {player.scores[roundIndex] || '-'}
+                      </td>
+                    ))}
+                    <td className="text-center py-2 pl-2 font-bold">
+                      {player.totalScore}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             </div>
           </div>
-        )}
+        </div>
 
         {/* Bottom Actions */}
         <div className="mt-6 space-y-3">
