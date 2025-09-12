@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeftIcon, UserGroupIcon } from '@heroicons/react/24/outline';
-import { DEFAULT_PLAYER_NAMES, createTournament } from '@/lib/gameLogic';
+import { DEFAULT_PLAYER_NAMES } from '@/lib/gameLogic';
 import { getSocket } from '@/lib/socket';
 
 export default function CreateTournamentPage() {
@@ -69,25 +69,22 @@ export default function CreateTournamentPage() {
   };
 
   const handleStartTournament = async () => {
-    if (filledCount === 8 && !isCreating) {
-      setIsCreating(true);
-      
-      // Use setTimeout to allow UI to update
-      setTimeout(() => {
-        const tournament = createTournament(accessCode, playerNames);
-        
-        // Store tournament in localStorage for now (later will use real-time DB)
-        localStorage.setItem('currentTournament', JSON.stringify(tournament));
-        
-        // Announce the created tournament and join its room
-        try {
-          const socket = getSocket();
-          socket.emit('create-tournament', tournament);
-        } catch(_) {}
-        
-        // Navigate to tournament screen
-        router.push(`/tournament/${tournament.id}`);
-      }, 100);
+    if (filledCount !== 8 || isCreating) return;
+    setIsCreating(true);
+    try {
+      const res = await fetch('/api/tournaments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessCode, playerNames }),
+      });
+      if (!res.ok) throw new Error('Failed to create tournament');
+      const tournament = await res.json();
+      try { localStorage.setItem('currentTournament', JSON.stringify(tournament)); } catch {}
+      try { const socket = getSocket(); socket.emit('create-tournament', tournament); } catch {}
+      router.push(`/tournament/${tournament.id}`);
+    } catch (e) {
+      setIsCreating(false);
+      alert('Unable to create tournament right now. Please try again.');
     }
   };
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ensureSchema, sql } from '@/lib/db';
+import { assembleTournament } from '../../route';
 import { validateScore } from '@/lib/gameLogic';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
@@ -46,8 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     // Return updated tournament
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/tournaments/${params.id}`, { cache: 'no-store' });
-    const updated = await res.json();
+    const updated = await assembleTournament(params.id);
     return NextResponse.json(updated);
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Server error' }, { status: 500 });

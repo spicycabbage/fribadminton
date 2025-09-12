@@ -27,10 +27,21 @@ export default function TournamentPage() {
   useEffect(() => {
     // Use requestAnimationFrame for smoother loading
     requestAnimationFrame(() => {
-      // Load tournament from localStorage (later will use real-time DB)
-      const storedTournament = localStorage.getItem('currentTournament');
-      if (storedTournament) {
-        const parsedTournament = JSON.parse(storedTournament);
+      // Load tournament from API first; fallback to localStorage
+      const id = (params as any)?.id as string;
+      let parsedTournament: any = null;
+      try {
+        const res = await fetch(`/api/tournaments/${id}`, { cache: 'no-store' });
+        if (res.ok) {
+          parsedTournament = await res.json();
+          try { localStorage.setItem('currentTournament', JSON.stringify(parsedTournament)); } catch {}
+        }
+      } catch {}
+      if (!parsedTournament) {
+        const storedTournament = localStorage.getItem('currentTournament');
+        if (storedTournament) parsedTournament = JSON.parse(storedTournament);
+      }
+      if (parsedTournament) {
         setTournament(parsedTournament);
         // Join live updates for this tournament
         try {

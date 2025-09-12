@@ -37,9 +37,7 @@ export default function JoinTournamentPage() {
           return;
         }
         clearTimeout(timeoutId);
-        try {
-          localStorage.setItem('currentTournament', JSON.stringify(serverTournament));
-        } catch {}
+        try { localStorage.setItem('currentTournament', JSON.stringify(serverTournament)); } catch {}
         router.push(`/tournament/${serverTournament.id}`);
       });
 
@@ -52,6 +50,17 @@ export default function JoinTournamentPage() {
         }
         setLoading(false);
       });
+
+      // Also try API path to find active by code in case socket memory was reset
+      try {
+        const apiRes = await fetch(`/api/tournaments/by-code/${encodeURIComponent(accessCode)}`, { cache: 'no-store' });
+        if (apiRes.ok) {
+          const t = await apiRes.json();
+          try { localStorage.setItem('currentTournament', JSON.stringify(t)); } catch {}
+          router.push(`/tournament/${t.id}`);
+          return;
+        }
+      } catch {}
 
       socket.emit('join-tournament', accessCode);
     } catch (err) {
