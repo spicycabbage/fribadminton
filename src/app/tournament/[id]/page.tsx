@@ -89,7 +89,7 @@ export default function TournamentPage() {
         setLoading(false);
       })();
     });
-  }, []);
+  }, [params]);
 
   const handleScoreUpdate = (matchId: number, scoreA: number, scoreB: number, isEdit: boolean = false) => {
     if (!tournament) return;
