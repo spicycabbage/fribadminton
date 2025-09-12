@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { ensureSchema, sql } from '@/lib/db';
-import { assembleTournament } from '../../route';
+import { assembleTournament } from '../route';
 import { validateScore } from '@/lib/gameLogic';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: { id: string } }) {
   try {
     await ensureSchema();
     const { matchId, scoreA, scoreB } = await req.json();
