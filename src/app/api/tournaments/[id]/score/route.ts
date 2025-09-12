@@ -37,8 +37,8 @@ export async function POST(req: Request, context: any) {
     }
 
     // Check if round is complete and possibly advance current round
-    const currentRoundMatches = await sql<any[]>`select completed from matches where tournament_id=${params.id} and round=${round}`;
-    const roundCompleted = currentRoundMatches.every(m => m.completed);
+    const currentRoundMatches = await sql<{ completed: boolean }[]>`select completed from matches where tournament_id=${params.id} and round=${round}`;
+    const roundCompleted = currentRoundMatches.every((m: { completed: boolean }) => m.completed === true);
     if (roundCompleted) {
       const [trow] = await sql<any[]>`select current_round from tournaments where id=${params.id}`;
       const currentRound = Number(trow?.current_round || 1);
