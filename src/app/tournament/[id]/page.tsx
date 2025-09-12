@@ -27,65 +27,67 @@ export default function TournamentPage() {
   useEffect(() => {
     // Use requestAnimationFrame for smoother loading
     requestAnimationFrame(() => {
-      // Load tournament from API first; fallback to localStorage
-      const id = (params as any)?.id as string;
-      let parsedTournament: any = null;
-      try {
-        const res = await fetch(`/api/tournaments/${id}`, { cache: 'no-store' });
-        if (res.ok) {
-          parsedTournament = await res.json();
-          try { localStorage.setItem('currentTournament', JSON.stringify(parsedTournament)); } catch {}
-        }
-      } catch {}
-      if (!parsedTournament) {
-        const storedTournament = localStorage.getItem('currentTournament');
-        if (storedTournament) parsedTournament = JSON.parse(storedTournament);
-      }
-      if (parsedTournament) {
-        setTournament(parsedTournament);
-        // Join live updates for this tournament
+      (async () => {
+        // Load tournament from API first; fallback to localStorage
+        const id = (params as any)?.id as string;
+        let parsedTournament: any = null;
         try {
-          const socket = getSocket();
-          const joinRoom = () => socket.emit('join-tournament', parsedTournament.accessCode);
-          joinRoom();
-          socket.io.on('reconnect', joinRoom);
-          socket.on('tournament:sync', (serverTournament: Tournament) => {
-            // Only accept updates for this tournament id
-            if (serverTournament?.id === parsedTournament.id) {
-              localStorage.setItem('currentTournament', JSON.stringify(serverTournament));
-              setTournament(serverTournament);
-            }
-          });
-          socket.on('toast:score', (payload: any) => {
-            if (payload && typeof payload === 'object') {
-              const { round, scoreA, scoreB, matchId } = payload as any;
-
-              const base = latestTournamentRef.current || parsedTournament;
-              let msg = `Scores updated for Round ${round}: ${scoreA}-${scoreB}`;
-              try {
-                const match = base?.matches.find((m: any) => m.id === matchId);
-                const getName = (id: number) => base?.players.find((p: any) => p.id === id)?.name || `P${id}`;
-                if (match) {
-                  const teamA = `${getName(match.teamA.player1)}-${getName(match.teamA.player2)}`;
-                  const teamB = `${getName(match.teamB.player1)}-${getName(match.teamB.player2)}`;
-                  msg = `Round ${round}: ${teamA} vs ${teamB} — ${scoreA}-${scoreB}`;
-                }
-              } catch {}
-
-              setToast(msg);
-              setTimeout(() => setToast(null), 3000);
-            }
-          });
-        } catch (_) {
-          // socket init failed in this environment; silently ignore
+          const res = await fetch(`/api/tournaments/${id}`, { cache: 'no-store' });
+          if (res.ok) {
+            parsedTournament = await res.json();
+            try { localStorage.setItem('currentTournament', JSON.stringify(parsedTournament)); } catch {}
+          }
+        } catch {}
+        if (!parsedTournament) {
+          const storedTournament = localStorage.getItem('currentTournament');
+          if (storedTournament) parsedTournament = JSON.parse(storedTournament);
         }
-        
-        // If tournament is complete, show rank tab
-        if (isTournamentComplete(parsedTournament)) {
-          setActiveTab('rank');
+        if (parsedTournament) {
+          setTournament(parsedTournament);
+          // Join live updates for this tournament
+          try {
+            const socket = getSocket();
+            const joinRoom = () => socket.emit('join-tournament', parsedTournament.accessCode);
+            joinRoom();
+            socket.io.on('reconnect', joinRoom);
+            socket.on('tournament:sync', (serverTournament: Tournament) => {
+              // Only accept updates for this tournament id
+              if (serverTournament?.id === parsedTournament.id) {
+                localStorage.setItem('currentTournament', JSON.stringify(serverTournament));
+                setTournament(serverTournament);
+              }
+            });
+            socket.on('toast:score', (payload: any) => {
+              if (payload && typeof payload === 'object') {
+                const { round, scoreA, scoreB, matchId } = payload as any;
+
+                const base = latestTournamentRef.current || parsedTournament;
+                let msg = `Scores updated for Round ${round}: ${scoreA}-${scoreB}`;
+                try {
+                  const match = base?.matches.find((m: any) => m.id === matchId);
+                  const getName = (id: number) => base?.players.find((p: any) => p.id === id)?.name || `P${id}`;
+                  if (match) {
+                    const teamA = `${getName(match.teamA.player1)}-${getName(match.teamA.player2)}`;
+                    const teamB = `${getName(match.teamB.player1)}-${getName(match.teamB.player2)}`;
+                    msg = `Round ${round}: ${teamA} vs ${teamB} — ${scoreA}-${scoreB}`;
+                  }
+                } catch {}
+
+                setToast(msg);
+                setTimeout(() => setToast(null), 3000);
+              }
+            });
+          } catch (_) {
+            // socket init failed in this environment; silently ignore
+          }
+          
+          // If tournament is complete, show rank tab
+          if (isTournamentComplete(parsedTournament)) {
+            setActiveTab('rank');
+          }
         }
-      }
-      setLoading(false);
+        setLoading(false);
+      })();
     });
   }, []);
 
