@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ensureSchema, sql, DbTournamentRow } from '@/lib/db';
 import { Tournament } from '@/lib/gameLogic';
 
-export async function GET(_: NextRequest, { params }: { params: { code: string } }) {
+export async function GET(_: Request, context: any) {
   try {
+    const { params } = context || { params: { code: '' } };
     await ensureSchema();
     const rows = await sql<DbTournamentRow[]>`
       select * from tournaments where access_code=${params.code} and is_finalized=false
