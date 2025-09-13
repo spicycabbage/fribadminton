@@ -154,19 +154,25 @@ export default function TournamentPage() {
     }
   };
 
-  const handlePlayerUpdate = (updatedPlayers: string[]) => {
+  const handlePlayerUpdate = async (updatedPlayers: string[]) => {
     if (!tournament) return;
-
-    const updatedTournament = {
-      ...tournament,
-      players: tournament.players.map((player, index) => ({
-        ...player,
-        name: updatedPlayers[index]
-      }))
-    };
-
-    setTournament(updatedTournament);
-    localStorage.setItem('currentTournament', JSON.stringify(updatedTournament));
+    try {
+      const res = await fetch(`/api/tournaments/${tournament.id}/players`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerNames: updatedPlayers }),
+      });
+      if (!res.ok) throw new Error('Failed to update players');
+      const updated = await res.json();
+      setTournament(updated);
+      try { localStorage.setItem('currentTournament', JSON.stringify(updated)); } catch {}
+      try {
+        const socket = getSocket();
+        socket.emit('tournament:update', { tournament: updated });
+      } catch {}
+    } catch (e) {
+      // Optimistic: keep local names even if API fails silently, but do nothing extra here
+    }
   };
 
   const handleFinalizeTournament = () => {
