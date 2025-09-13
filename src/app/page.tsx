@@ -3,6 +3,24 @@
 import Link from 'next/link';
 
 export default function HomePage() {
+  const [hasActive, setHasActive] = React.useState<boolean>(false);
+  const [checking, setChecking] = React.useState<boolean>(true);
+
+  React.useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/tournaments/active', { cache: 'no-store' });
+        if (!ignore && res.ok) {
+          const data = await res.json();
+          setHasActive(!!data?.active);
+        }
+      } catch {}
+      if (!ignore) setChecking(false);
+    })();
+    return () => { ignore = true; };
+  }, []);
+
   return (
     <div className="mobile-container bg-blue-600 flex flex-col justify-center items-center min-h-screen safe-area-inset-top safe-area-inset-bottom">
       {/* Main Tournament Section */}
@@ -14,11 +32,23 @@ export default function HomePage() {
         </div>
 
         <div className="space-y-4">
+          {hasActive && (
+            <div className="w-full bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg text-sm font-medium text-center">
+              A tournament is already in progress
+            </div>
+          )}
           <Link 
             href="/create-tournament" 
             className="block w-full"
           >
-            <button className="w-full bg-black text-white py-4 rounded-lg font-semibold text-lg hover:bg-gray-800 transition-colors">
+            <button
+              disabled={hasActive}
+              className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors ${
+                hasActive
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-black text-white hover:bg-gray-800'
+              }`}
+            >
               Create New Tournament
             </button>
           </Link>
