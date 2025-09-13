@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Player } from '@/lib/gameLogic';
 import { PencilIcon } from '@heroicons/react/24/outline';
 
