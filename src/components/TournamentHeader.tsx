@@ -14,10 +14,11 @@ export default function TournamentHeader({
   onTabChange 
 }: TournamentHeaderProps) {
   const formatDate = (dateString: string) => {
-    // Parse YYYY-MM-DD as a local date to avoid timezone shifting to previous day
+    // Interpret stored YYYY-MM-DD as Pacific Time
     const [y, m, d] = dateString.split('-').map(Number);
-    const local = new Date(y, (m || 1) - 1, d || 1);
-    return local.toLocaleDateString('en-US', {
+    const pacific = new Date(Date.UTC(y, (m || 1) - 1, d || 1));
+    return pacific.toLocaleDateString('en-US', {
+      timeZone: 'America/Los_Angeles',
       weekday: 'long',
       year: 'numeric',
       month: 'long',

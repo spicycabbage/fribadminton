@@ -105,13 +105,17 @@ export function createTournament(accessCode: string, playerNames: string[]): Tou
   return {
     id: generateTournamentId(),
     accessCode,
-    // Store date as local YYYY-MM-DD to avoid timezone shifts later
+    // Store date as Pacific Time (PST/PDT) YYYY-MM-DD
     date: (() => {
       const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const d = String(now.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
+      // en-CA yields YYYY-MM-DD; force Pacific Time
+      const fmt = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Los_Angeles',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      return fmt.format(now);
     })(),
     players,
     matches,

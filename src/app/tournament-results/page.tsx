@@ -35,10 +35,11 @@ export default function TournamentResultsPage() {
   }, []);
 
   const formatDate = (dateString: string) => {
-    // dateString is stored as YYYY-MM-DD; parse as LOCAL date to avoid timezone shift
+    // Interpret stored YYYY-MM-DD in Pacific Time
     const [y, m, d] = dateString.split('-').map(Number);
-    const local = new Date(y, (m || 1) - 1, d || 1);
-    return local.toLocaleDateString('en-US', {
+    const pacific = new Date(Date.UTC(y, (m || 1) - 1, d || 1));
+    return pacific.toLocaleDateString('en-US', {
+      timeZone: 'America/Los_Angeles',
       year: 'numeric',
       month: 'short',
       day: 'numeric',
