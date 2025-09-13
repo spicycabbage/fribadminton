@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
-  const [hasActive, setHasActive] = React.useState<boolean>(false);
-  const [checking, setChecking] = React.useState<boolean>(true);
+  const [hasActive, setHasActive] = useState<boolean>(false);
+  const [checking, setChecking] = useState<boolean>(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let ignore = false;
     (async () => {
       try {
