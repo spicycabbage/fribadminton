@@ -235,6 +235,7 @@ export default function TournamentPage() {
             players={tournament.players}
             onUpdatePlayers={handlePlayerUpdate}
             isFinalized={tournament.isFinalized}
+            isEditable={!tournament.matches.some(m => m.completed)}
           />
         )}
 

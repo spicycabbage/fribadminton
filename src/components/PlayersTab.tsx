@@ -8,13 +8,15 @@ interface PlayersTabProps {
   players: Player[];
   onUpdatePlayers: (updatedNames: string[]) => void;
   isFinalized: boolean;
+  isEditable: boolean;
 }
 
-export default function PlayersTab({ players, onUpdatePlayers, isFinalized }: PlayersTabProps) {
+export default function PlayersTab({ players, onUpdatePlayers, isFinalized, isEditable }: PlayersTabProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNames, setEditedNames] = useState(players.map(p => p.name));
 
   const handleStartEdit = () => {
+    if (!isEditable || isFinalized) return;
     setIsEditing(true);
     setEditedNames(players.map(p => p.name));
   };
@@ -98,15 +100,15 @@ export default function PlayersTab({ players, onUpdatePlayers, isFinalized }: Pl
         {!isEditing ? (
           <button
             onClick={handleStartEdit}
-            disabled={isFinalized}
+            disabled={isFinalized || !isEditable}
             className={`w-full py-4 rounded-lg font-semibold transition-colors ${
-              isFinalized
+              isFinalized || !isEditable
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-black text-white hover:bg-gray-800'
             }`}
           >
             <PencilIcon className="w-5 h-5 inline mr-2" />
-            {isFinalized ? 'Tournament Finalized' : 'Update Players'}
+            {isFinalized ? 'Tournament Finalized' : (!isEditable ? 'Players Locked' : 'Update Players')}
           </button>
         ) : (
           <div className="space-y-3">
