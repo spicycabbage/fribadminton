@@ -49,14 +49,16 @@ export default function HomePage() {
             </Link>
           )}
 
-          <Link 
-            href="/join-tournament" 
-            className="block w-full"
-          >
-            <button className="w-full bg-gray-200 text-gray-800 py-4 rounded-lg font-semibold text-lg hover:bg-gray-300 transition-colors">
-              Join Tournament
-            </button>
-          </Link>
+          {hasActive && (
+            <Link 
+              href="/join-tournament" 
+              className="block w-full"
+            >
+              <button className="w-full bg-green-500 text-white py-4 rounded-lg font-semibold text-lg hover:bg-green-600 transition-colors">
+                Join Tournament
+              </button>
+            </Link>
+          )}
         </div>
       </div>
 
