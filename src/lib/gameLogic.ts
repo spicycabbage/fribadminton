@@ -13,6 +13,7 @@ export interface Match {
   scoreA: number | null;
   scoreB: number | null;
   completed: boolean;
+  winnerTeam?: 'A' | 'B' | null;
 }
 
 export interface Tournament {
@@ -97,7 +98,8 @@ export function createTournament(accessCode: string, playerNames: string[]): Tou
         },
         scoreA: null,
         scoreB: null,
-        completed: false
+        completed: false,
+        winnerTeam: null
       });
     });
   });
@@ -151,6 +153,7 @@ export function updateMatchScore(
   match.scoreA = scoreA;
   match.scoreB = scoreB;
   match.completed = true;
+  match.winnerTeam = scoreA === 21 ? 'A' : 'B';
 
   // Update player scores
   const roundIndex = match.round - 1;

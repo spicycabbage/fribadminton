@@ -42,6 +42,7 @@ export function ensureSchema(): Promise<void> {
       score_a int,
       score_b int,
       completed boolean not null default false,
+      winner_team text,
       primary key (tournament_id, id),
       foreign key (tournament_id) references tournaments(id) on delete cascade
     )`;

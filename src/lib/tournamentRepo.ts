@@ -17,6 +17,7 @@ export async function assembleTournament(id: string): Promise<Tournament | null>
     score_a: number | null;
     score_b: number | null;
     completed: boolean;
+    winner_team: string | null;
   }[]>`select * from matches where tournament_id=${id} order by id asc`;
 
   // Build per-player, per-round scores from matches
@@ -46,6 +47,7 @@ export async function assembleTournament(id: string): Promise<Tournament | null>
       scoreA: m.score_a,
       scoreB: m.score_b,
       completed: m.completed,
+      winnerTeam: (m.winner_team === 'A' || m.winner_team === 'B') ? (m.winner_team as 'A' | 'B') : null,
     })),
     currentRound: tr.current_round,
     isFinalized: tr.is_finalized,
