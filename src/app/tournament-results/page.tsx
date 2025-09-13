@@ -35,10 +35,10 @@ export default function TournamentResultsPage() {
   }, []);
 
   const formatDate = (dateString: string) => {
-    // Interpret stored YYYY-MM-DD in Pacific Time
+    // Interpret stored YYYY-MM-DD in Pacific Time without day shift
     const [y, m, d] = dateString.split('-').map(Number);
-    const pacific = new Date(Date.UTC(y, (m || 1) - 1, d || 1));
-    return pacific.toLocaleDateString('en-US', {
+    const middayUtc = new Date(Date.UTC(y, (m || 1) - 1, d || 1, 12, 0, 0));
+    return middayUtc.toLocaleDateString('en-US', {
       timeZone: 'America/Los_Angeles',
       year: 'numeric',
       month: 'short',
