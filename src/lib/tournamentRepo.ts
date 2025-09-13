@@ -18,11 +18,26 @@ export async function assembleTournament(id: string): Promise<Tournament | null>
     score_b: number | null;
     completed: boolean;
   }[]>`select * from matches where tournament_id=${id} order by id asc`;
+
+  // Build per-player, per-round scores from matches
+  const playerScoresByRound: Record<number, number[]> = {};
+  players.forEach(p => { playerScoresByRound[p.id] = new Array(7).fill(0); });
+  for (const m of matches) {
+    const r = Math.max(1, Math.min(7, Number(m.round || 1))) - 1;
+    if (m.score_a != null) {
+      if (playerScoresByRound[m.team_a_p1]) playerScoresByRound[m.team_a_p1][r] = m.score_a;
+      if (playerScoresByRound[m.team_a_p2]) playerScoresByRound[m.team_a_p2][r] = m.score_a;
+    }
+    if (m.score_b != null) {
+      if (playerScoresByRound[m.team_b_p1]) playerScoresByRound[m.team_b_p1][r] = m.score_b;
+      if (playerScoresByRound[m.team_b_p2]) playerScoresByRound[m.team_b_p2][r] = m.score_b;
+    }
+  }
   return {
     id: tr.id,
     accessCode: tr.access_code,
     date: tr.date,
-    players: players.map((p: { id: number; name: string; total_score: number }) => ({ id: p.id, name: p.name, scores: new Array(7).fill(0), totalScore: p.total_score })),
+    players: players.map((p: { id: number; name: string; total_score: number }) => ({ id: p.id, name: p.name, scores: playerScoresByRound[p.id] || new Array(7).fill(0), totalScore: p.total_score })),
     matches: matches.map((m: { id: number; round: number; team_a_p1: number; team_a_p2: number; team_b_p1: number; team_b_p2: number; score_a: number | null; score_b: number | null; completed: boolean }) => ({
       id: m.id,
       round: m.round,
