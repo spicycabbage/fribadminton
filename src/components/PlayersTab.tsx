@@ -29,6 +29,14 @@ export default function PlayersTab({ players, onUpdatePlayers, isFinalized }: Pl
     setIsEditing(false);
   };
 
+  // Keep editedNames in sync with latest players when not actively editing
+  // so inputs are pre-populated correctly when entering edit mode later
+  useEffect(() => {
+    if (!isEditing) {
+      setEditedNames(players.map(p => p.name));
+    }
+  }, [players, isEditing]);
+
   const handleNameChange = (index: number, value: string) => {
     const newNames = [...editedNames];
     newNames[index] = value;
@@ -70,7 +78,7 @@ export default function PlayersTab({ players, onUpdatePlayers, isFinalized }: Pl
               {isEditing ? (
                 <input
                   type="text"
-                  value={editedNames[index]}
+                  value={editedNames[index] ?? player.name}
                   onChange={(e) => handleNameChange(index, e.target.value)}
                   className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter player name"
