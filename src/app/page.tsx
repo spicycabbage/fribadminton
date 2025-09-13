@@ -38,21 +38,16 @@ export default function HomePage() {
               A tournament is already in progress
             </div>
           )}
-          <Link 
-            href="/create-tournament" 
-            className="block w-full"
-          >
-            <button
-              disabled={hasActive}
-              className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors ${
-                hasActive
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-black text-white hover:bg-gray-800'
-              }`}
+          {!hasActive && (
+            <Link 
+              href="/create-tournament" 
+              className="block w-full"
             >
-              Create New Tournament
-            </button>
-          </Link>
+              <button className="w-full bg-black text-white py-4 rounded-lg font-semibold text-lg hover:bg-gray-800 transition-colors">
+                Create New Tournament
+              </button>
+            </Link>
+          )}
 
           <Link 
             href="/join-tournament" 
