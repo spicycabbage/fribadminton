@@ -175,27 +175,28 @@ export default function TournamentPage() {
     }
   };
 
-  const handleFinalizeTournament = () => {
+  const handleFinalizeTournament = async () => {
     if (!tournament) return;
 
-    const finalizedTournament = {
-      ...tournament,
-      isFinalized: true
-    };
-
-    setTournament(finalizedTournament);
-    localStorage.setItem('currentTournament', JSON.stringify(finalizedTournament));
-
-    // Broadcast finalization so all clients lock immediately
     try {
-      const socket = getSocket();
-      socket.emit('tournament:update', finalizedTournament);
-    } catch {}
+      // Persist to Neon so Home active-state reflects immediately
+      const res = await fetch(`/api/tournaments/${tournament.id}/finalize`, { method: 'POST' });
+      const updated = res.ok ? await res.json() : { ...tournament, isFinalized: true };
 
-    // Save to tournament history
-    const history = JSON.parse(localStorage.getItem('tournamentHistory') || '[]');
-    history.push(finalizedTournament);
-    localStorage.setItem('tournamentHistory', JSON.stringify(history));
+      setTournament(updated);
+      try { localStorage.setItem('currentTournament', JSON.stringify(updated)); } catch {}
+
+      // Broadcast finalization so all clients lock immediately
+      try {
+        const socket = getSocket();
+        socket.emit('tournament:update', { tournament: updated });
+      } catch {}
+
+      // Save to tournament history locally
+      const history = JSON.parse(localStorage.getItem('tournamentHistory') || '[]');
+      history.push(updated);
+      localStorage.setItem('tournamentHistory', JSON.stringify(history));
+    } catch {}
   };
 
   if (loading) {
