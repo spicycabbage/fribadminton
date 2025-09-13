@@ -10,6 +10,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
+    // Enforce only one active tournament at a time
+    const active = await sql<{ c: number }[]>`select count(*)::int as c from tournaments where is_finalized=false`;
+    if ((active[0]?.c || 0) > 0) {
+      return NextResponse.json({ error: 'active_tournament_exists' }, { status: 409 });
+    }
+
     const t = createTournament(accessCode, playerNames);
 
     await sql`insert into tournaments (id, access_code, date, current_round, is_finalized)

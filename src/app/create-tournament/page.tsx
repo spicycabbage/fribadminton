@@ -77,6 +77,11 @@ export default function CreateTournamentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accessCode, playerNames }),
       });
+      if (res.status === 409) {
+        alert('An active tournament already exists. Please finalize it first, or use it.');
+        setIsCreating(false);
+        return;
+      }
       if (!res.ok) throw new Error('Failed to create tournament');
       const tournament = await res.json();
       try { localStorage.setItem('currentTournament', JSON.stringify(tournament)); } catch {}
