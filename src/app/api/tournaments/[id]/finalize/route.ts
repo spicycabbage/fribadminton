@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ensureSchema, sql } from '@/lib/db';
 
-export async function POST(_: Request, context: any) {
-  const { params } = context || { params: { id: '' } };
+export async function POST(_: Request, { params }: { params: { id: string } }) {
   try {
     await ensureSchema();
     await sql`update tournaments set is_finalized=true where id=${params.id}`;

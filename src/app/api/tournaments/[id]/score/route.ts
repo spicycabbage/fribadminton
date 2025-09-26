@@ -3,8 +3,7 @@ import { ensureSchema, sql } from '@/lib/db';
 import { assembleTournament } from '@/lib/tournamentRepo';
 import { validateScore } from '@/lib/gameLogic';
 
-export async function POST(req: Request, context: any) {
-  const { params } = context || { params: { id: '' } };
+export async function POST(req: Request, { params }: { params: { id: string } }) {
   try {
     await ensureSchema();
     const { matchId, scoreA, scoreB } = await req.json();
