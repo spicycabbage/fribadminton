@@ -123,7 +123,7 @@ export default function AnalyticsPage() {
           ) : (
             <div className="space-y-3">
               {/* Header */}
-              <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-2 px-3 py-2 bg-gray-100 rounded-lg text-xs font-semibold text-gray-600">
+              <div className="grid grid-cols-[2fr_0.8fr_0.8fr_1fr_1fr] gap-1 px-3 py-2 bg-gray-100 rounded-lg text-xs font-semibold text-gray-600">
                 <div>Player</div>
                 <div className="text-center">W</div>
                 <div className="text-center">L</div>
@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
 
               {/* Player Stats */}
               {playerStats.map((player, index) => (
-                <div key={player.name} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-2 px-3 py-3 bg-gray-50 rounded-lg items-center">
+                <div key={player.name} className="grid grid-cols-[2fr_0.8fr_0.8fr_1fr_1fr] gap-1 px-3 py-3 bg-gray-50 rounded-lg items-center">
                   <div className="flex items-center">
                     <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-semibold mr-3">
                       {index + 1}
@@ -207,18 +207,18 @@ export default function AnalyticsPage() {
               ) : (
                 <div className="space-y-3">
                   {/* Header */}
-                  <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-600">
+                  <div className="grid grid-cols-[2fr_0.6fr_0.6fr_0.8fr_0.8fr_1fr] gap-1 px-2 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-600">
                     <div>Opponent</div>
                     <div className="text-center">W</div>
                     <div className="text-center">L</div>
                     <div className="text-center">Total</div>
                     <div className="text-center">Win%</div>
-                    <div className="text-center">Avg Margin</div>
+                    <div className="text-center">Margin</div>
                   </div>
 
                   {/* Head-to-Head Records */}
                   {headToHeadData.map((record) => (
-                    <div key={record.opponent} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-2 bg-gray-50 rounded items-center">
+                    <div key={record.opponent} className="grid grid-cols-[2fr_0.6fr_0.6fr_0.8fr_0.8fr_1fr] gap-1 px-2 py-2 bg-gray-50 rounded items-center">
                       <div className="font-semibold truncate">{record.opponent}</div>
                       <div className="text-center font-semibold text-green-600">{record.wins}</div>
                       <div className="text-center font-semibold text-red-600">{record.losses}</div>
