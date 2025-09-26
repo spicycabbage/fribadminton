@@ -35,7 +35,7 @@ export async function GET() {
       
       if (players.length > 0) {
         // Convert all players to proper format (needed for full rankings)
-        tournament.players = players.map(p => ({
+        tournament.players = players.map((p: { id: number; name: string; total_score: number }) => ({
           id: p.id,
           name: p.name,
           scores: new Array(7).fill(0), // Not needed for history display
