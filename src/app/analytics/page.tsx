@@ -183,7 +183,7 @@ export default function AnalyticsPage() {
             <div className="p-4 border-b bg-blue-50">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-gray-800">
-                  {selectedPlayer}'s Head-to-Head
+                  {selectedPlayer}&apos;s Head-to-Head
                 </h3>
                 <button
                   onClick={closeHeadToHead}
