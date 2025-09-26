@@ -8,6 +8,7 @@ import { Tournament, getRankedPlayers } from '@/lib/gameLogic';
 export default function TournamentResultsPage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'history' | 'finishes'>('history');
 
   useEffect(() => {
     const loadTournaments = async () => {
@@ -99,22 +100,55 @@ export default function TournamentResultsPage() {
             </Link>
           </div>
         ) : (
-          <div className="p-4">
-            <div className="mb-6 text-center">
-              <h2 className="text-xl font-bold text-gray-800">Tournament History</h2>
-              <p className="text-gray-600 text-sm">
-                {tournaments.length} completed tournament{tournaments.length !== 1 ? 's' : ''}
-              </p>
+          <div>
+            {/* Tab Navigation */}
+            <div className="flex border-b">
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`flex-1 py-3 px-4 text-center font-semibold transition-colors ${
+                  activeTab === 'history'
+                    ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                Tournament History
+              </button>
+              <button
+                onClick={() => setActiveTab('finishes')}
+                className={`flex-1 py-3 px-4 text-center font-semibold transition-colors ${
+                  activeTab === 'finishes'
+                    ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                Historical Finishes
+              </button>
             </div>
 
-            <div className="space-y-4">
-              {tournaments.map((tournament) => (
-                <TournamentResultCard 
-                  key={tournament.id} 
-                  tournament={tournament}
-                  formatDate={formatDate}
-                />
-              ))}
+            {/* Tab Content */}
+            <div className="p-4">
+              {activeTab === 'history' ? (
+                <div>
+                  <div className="mb-6 text-center">
+                    <h2 className="text-xl font-bold text-gray-800">Tournament History</h2>
+                    <p className="text-gray-600 text-sm">
+                      {tournaments.length} completed tournament{tournaments.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    {tournaments.map((tournament) => (
+                      <TournamentResultCard 
+                        key={tournament.id} 
+                        tournament={tournament}
+                        formatDate={formatDate}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <HistoricalFinishesTab tournaments={tournaments} />
+              )}
             </div>
           </div>
         )}
@@ -146,9 +180,6 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
             <div>
               <p className="font-semibold text-gray-800">
                 {formatDate(tournament.date)}
-              </p>
-              <p className="text-sm text-gray-600">
-                Code: {tournament.accessCode}
               </p>
             </div>
           </div>
@@ -195,6 +226,117 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+interface HistoricalFinishesTabProps {
+  tournaments: Tournament[];
+}
+
+function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
+  // Calculate historical finishes for each player
+  const playerFinishes: Record<string, number[]> = {};
+  
+  tournaments.forEach(tournament => {
+    const rankedPlayers = getRankedPlayers(tournament);
+    rankedPlayers.forEach((player, index) => {
+      if (!playerFinishes[player.name]) {
+        playerFinishes[player.name] = new Array(8).fill(0); // positions 1-8
+      }
+      if (index < 8) { // Only count top 8 positions
+        playerFinishes[player.name][index]++;
+      }
+    });
+  });
+
+  // Convert to array and sort by total tournaments played (descending)
+  const playerStats = Object.entries(playerFinishes).map(([name, finishes]) => ({
+    name,
+    finishes,
+    totalTournaments: finishes.reduce((sum, count) => sum + count, 0)
+  })).sort((a, b) => b.totalTournaments - a.totalTournaments);
+
+  const getPositionColor = (position: number) => {
+    switch (position) {
+      case 0: return 'text-yellow-600'; // 1st
+      case 1: return 'text-gray-500'; // 2nd
+      case 2: return 'text-amber-600'; // 3rd
+      default: return 'text-gray-700';
+    }
+  };
+
+  const getPositionBg = (position: number) => {
+    switch (position) {
+      case 0: return 'bg-yellow-50'; // 1st
+      case 1: return 'bg-gray-50'; // 2nd
+      case 2: return 'bg-amber-50'; // 3rd
+      default: return 'bg-gray-50';
+    }
+  };
+
+  if (playerStats.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <TrophyIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <h3 className="text-xl font-bold text-gray-600 mb-2">No Historical Data</h3>
+        <p className="text-gray-500">
+          Complete more tournaments to see historical finishes
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="mb-6 text-center">
+        <h2 className="text-xl font-bold text-gray-800">Historical Finishes</h2>
+        <p className="text-gray-600 text-sm">
+          How many times each player finished in each position
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        {/* Header */}
+        <div className="grid grid-cols-[2fr_repeat(8,1fr)] gap-1 px-3 py-2 bg-gray-100 rounded-lg text-xs font-semibold text-gray-600">
+          <div>Player</div>
+          <div className="text-center">1st</div>
+          <div className="text-center">2nd</div>
+          <div className="text-center">3rd</div>
+          <div className="text-center">4th</div>
+          <div className="text-center">5th</div>
+          <div className="text-center">6th</div>
+          <div className="text-center">7th</div>
+          <div className="text-center">8th</div>
+        </div>
+
+        {/* Player Stats */}
+        {playerStats.map((player) => (
+          <div key={player.name} className="grid grid-cols-[2fr_repeat(8,1fr)] gap-1 px-3 py-3 bg-gray-50 rounded-lg items-center">
+            <div className="flex items-center">
+              <span className="font-semibold truncate">{player.name}</span>
+              <span className="ml-2 text-xs text-gray-500">({player.totalTournaments})</span>
+            </div>
+            {player.finishes.map((count, position) => (
+              <div key={position} className={`text-center ${getPositionBg(position)} rounded px-1 py-1`}>
+                <span className={`font-semibold ${getPositionColor(position)}`}>
+                  {count || '-'}
+                </span>
+              </div>
+            ))}
+          </div>
+        ))}
+
+        {/* Summary */}
+        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+          <h3 className="font-semibold text-blue-800 mb-2">Summary</h3>
+          <div className="text-sm text-blue-700">
+            <p>• Total Players: {playerStats.length}</p>
+            <p>• Total Tournaments: {tournaments.length}</p>
+            <p>• Most Active: {playerStats[0]?.name} ({playerStats[0]?.totalTournaments} tournaments)</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
