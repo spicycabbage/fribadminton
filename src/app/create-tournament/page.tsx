@@ -75,7 +75,7 @@ export default function CreateTournamentPage() {
       const res = await fetch('/api/tournaments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessCode, playerNames }),
+        body: JSON.stringify({ accessCode, playerNames, date: tournamentDate }),
       });
       if (res.status === 409) {
         alert('An active tournament already exists. Please finalize it first, or use it.');

@@ -72,7 +72,7 @@ export const DEFAULT_PLAYER_NAMES = [
   'Ian', 'Trevor', 'Jim', 'Peter', 'Ben', 'Andrew', 'Dan', 'Yves', 'Brian'
 ];
 
-export function createTournament(accessCode: string, playerNames: string[]): Tournament {
+export function createTournament(accessCode: string, playerNames: string[], date?: string): Tournament {
   const players: Player[] = playerNames.map((name, index) => ({
     id: index + 1,
     name,
@@ -107,8 +107,8 @@ export function createTournament(accessCode: string, playerNames: string[]): Tou
   return {
     id: generateTournamentId(),
     accessCode,
-    // Store date as Pacific Time (PST/PDT) YYYY-MM-DD
-    date: (() => {
+    // Use provided date or default to today in Pacific Time
+    date: date || (() => {
       const now = new Date();
       // en-CA yields YYYY-MM-DD; force Pacific Time
       const fmt = new Intl.DateTimeFormat('en-CA', {

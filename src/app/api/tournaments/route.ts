@@ -5,7 +5,7 @@ import { createTournament } from '@/lib/gameLogic';
 export async function POST(req: NextRequest) {
   try {
     await ensureSchema();
-    const { accessCode, playerNames } = await req.json();
+    const { accessCode, playerNames, date } = await req.json();
     if (!accessCode || !Array.isArray(playerNames) || playerNames.length !== 8) {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'active_tournament_exists' }, { status: 409 });
     }
 
-    const t = createTournament(accessCode, playerNames);
+    const t = createTournament(accessCode, playerNames, date);
 
     await sql`insert into tournaments (id, access_code, date, current_round, is_finalized)
       values (${t.id}, ${t.accessCode}, ${t.date}, ${t.currentRound}, ${t.isFinalized})`;
