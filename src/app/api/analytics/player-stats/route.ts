@@ -26,7 +26,7 @@ export async function GET() {
     // Get all players from finalized tournaments
     const players = await sql<{ name: string }[]>`
       SELECT DISTINCT name FROM players 
-      WHERE tournament_id IN (${tournaments.map(t => `'${t.id}'`).join(',')})
+      WHERE tournament_id IN (${tournaments.map((t: { id: string }) => `'${t.id}'`).join(',')})
       ORDER BY name
     `;
 
