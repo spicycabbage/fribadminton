@@ -12,9 +12,21 @@ interface PlayerStats {
   winPercentage: number;
 }
 
+interface HeadToHeadRecord {
+  opponent: string;
+  wins: number;
+  losses: number;
+  totalMatches: number;
+  winPercentage: number;
+  avgMargin: number;
+}
+
 export default function AnalyticsPage() {
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+  const [headToHeadData, setHeadToHeadData] = useState<HeadToHeadRecord[]>([]);
+  const [loadingHeadToHead, setLoadingHeadToHead] = useState(false);
 
   useEffect(() => {
     const loadPlayerStats = async () => {
@@ -37,6 +49,34 @@ export default function AnalyticsPage() {
 
     loadPlayerStats();
   }, []);
+
+  const loadHeadToHeadData = async (playerName: string) => {
+    setLoadingHeadToHead(true);
+    try {
+      const response = await fetch('/api/analytics/head-to-head', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerName }),
+        cache: 'no-store'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setHeadToHeadData(data);
+        setSelectedPlayer(playerName);
+      } else {
+        console.error('Failed to load head-to-head data:', response.status);
+      }
+    } catch (error) {
+      console.error('Error loading head-to-head data:', error);
+    }
+    setLoadingHeadToHead(false);
+  };
+
+  const closeHeadToHead = () => {
+    setSelectedPlayer(null);
+    setHeadToHeadData([]);
+  };
 
   if (loading) {
     return (
@@ -98,7 +138,13 @@ export default function AnalyticsPage() {
                     <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-semibold mr-3">
                       {index + 1}
                     </span>
-                    <span className="font-semibold truncate">{player.name}</span>
+                    <button 
+                      onClick={() => loadHeadToHeadData(player.name)}
+                      className="font-semibold truncate text-left hover:text-blue-600 hover:underline transition-colors"
+                      disabled={loadingHeadToHead}
+                    >
+                      {player.name}
+                    </button>
                   </div>
                   <div className="text-center font-semibold text-green-600">{player.wins}</div>
                   <div className="text-center font-semibold text-red-600">{player.losses}</div>
@@ -128,6 +174,89 @@ export default function AnalyticsPage() {
           )}
         </div>
       </div>
+
+      {/* Head-to-Head Modal */}
+      {selectedPlayer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[80vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-4 border-b bg-blue-50">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-800">
+                  {selectedPlayer}'s Head-to-Head
+                </h3>
+                <button
+                  onClick={closeHeadToHead}
+                  className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-4 overflow-y-auto max-h-[60vh]">
+              {loadingHeadToHead ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-600">Loading head-to-head data...</div>
+                </div>
+              ) : headToHeadData.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-600">No head-to-head data available</div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {/* Header */}
+                  <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-600">
+                    <div>Opponent</div>
+                    <div className="text-center">W</div>
+                    <div className="text-center">L</div>
+                    <div className="text-center">Total</div>
+                    <div className="text-center">Win%</div>
+                    <div className="text-center">Avg Margin</div>
+                  </div>
+
+                  {/* Head-to-Head Records */}
+                  {headToHeadData.map((record) => (
+                    <div key={record.opponent} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-2 bg-gray-50 rounded items-center">
+                      <div className="font-semibold truncate">{record.opponent}</div>
+                      <div className="text-center font-semibold text-green-600">{record.wins}</div>
+                      <div className="text-center font-semibold text-red-600">{record.losses}</div>
+                      <div className="text-center font-semibold">{record.totalMatches}</div>
+                      <div className="text-center">
+                        <span className={`font-semibold ${
+                          record.winPercentage >= 70 ? 'text-green-600' :
+                          record.winPercentage >= 50 ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`}>
+                          {record.winPercentage}%
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <span className={`font-semibold ${
+                          record.avgMargin > 0 ? 'text-green-600' :
+                          record.avgMargin < 0 ? 'text-red-600' :
+                          'text-gray-600'
+                        }`}>
+                          {record.avgMargin > 0 ? '+' : ''}{record.avgMargin}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Summary */}
+                  <div className="mt-4 p-3 bg-blue-50 rounded">
+                    <div className="text-sm text-blue-700">
+                      <p>• Total Opponents: {headToHeadData.length}</p>
+                      <p>• Best Record: {headToHeadData.length > 0 ? `${headToHeadData[0].wins}-${headToHeadData[0].losses} vs ${headToHeadData[0].opponent}` : 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
