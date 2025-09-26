@@ -10,28 +10,46 @@ export default function TournamentResultsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load tournament history from localStorage
-    const history = JSON.parse(localStorage.getItem('tournamentHistory') || '[]');
-    
-    // Also check for current tournament if it's completed
-    const currentTournament = localStorage.getItem('currentTournament');
-    if (currentTournament) {
-      const tournament = JSON.parse(currentTournament);
-      const allMatches = tournament.matches;
-      const isComplete = allMatches.every((match: any) => match.completed);
-      
-      if (isComplete && !history.find((t: Tournament) => t.id === tournament.id)) {
-        history.unshift(tournament);
+    const loadTournaments = async () => {
+      try {
+        // Load from database first
+        const response = await fetch('/api/tournaments/history', { cache: 'no-store' });
+        if (response.ok) {
+          const dbTournaments = await response.json();
+          setTournaments(dbTournaments);
+        } else {
+          // Fallback to localStorage if API fails
+          const history = JSON.parse(localStorage.getItem('tournamentHistory') || '[]');
+          
+          // Also check for current tournament if it's completed
+          const currentTournament = localStorage.getItem('currentTournament');
+          if (currentTournament) {
+            const tournament = JSON.parse(currentTournament);
+            const allMatches = tournament.matches;
+            const isComplete = allMatches.every((match: any) => match.completed);
+            
+            if (isComplete && !history.find((t: Tournament) => t.id === tournament.id)) {
+              history.unshift(tournament);
+            }
+          }
+
+          // Sort by date (newest first)
+          history.sort((a: Tournament, b: Tournament) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+
+          setTournaments(history);
+        }
+      } catch (error) {
+        // Fallback to localStorage on error
+        const history = JSON.parse(localStorage.getItem('tournamentHistory') || '[]');
+        setTournaments(history);
       }
-    }
+      
+      setLoading(false);
+    };
 
-    // Sort by date (newest first)
-    history.sort((a: Tournament, b: Tournament) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    setTournaments(history);
-    setLoading(false);
+    loadTournaments();
   }, []);
 
   const formatDate = (dateString: string) => {
@@ -87,6 +105,18 @@ export default function TournamentResultsPage() {
               <p className="text-gray-600 text-sm">
                 {tournaments.length} completed tournament{tournaments.length !== 1 ? 's' : ''}
               </p>
+              <button
+                onClick={() => {
+                  if (confirm('Clear all tournament history from this device?')) {
+                    localStorage.removeItem('tournamentHistory');
+                    localStorage.removeItem('currentTournament');
+                    window.location.reload();
+                  }
+                }}
+                className="mt-2 bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600"
+              >
+                Clear Cache
+              </button>
             </div>
 
             <div className="space-y-4">
@@ -112,8 +142,11 @@ interface TournamentResultCardProps {
 
 function TournamentResultCard({ tournament, formatDate }: TournamentResultCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const rankedPlayers = getRankedPlayers(tournament);
-  const winner = rankedPlayers[0];
+  const [fullTournament, setFullTournament] = useState<Tournament | null>(null);
+  
+  // For history view, we might only have winner data
+  const winner = tournament.players[0];
+  const hasFullData = tournament.matches && tournament.matches.length > 0;
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -149,24 +182,34 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
       {/* Expanded Details */}
       {expanded && (
         <div className="p-4 border-t">
-          <h4 className="font-semibold mb-3">Final Standings</h4>
-          <div className="space-y-2">
-            {rankedPlayers.map((player, index) => (
-              <div key={player.id} className="flex items-center justify-between py-2">
-                <div className="flex items-center">
-                  <span className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-semibold mr-3">
-                    {index + 1}
-                  </span>
-                  <span className={index === 0 ? 'font-semibold text-yellow-600' : ''}>
-                    {player.name}
-                  </span>
-                </div>
-                <span className="font-semibold">
-                  {player.totalScore - 147}
-                </span>
+          {hasFullData ? (
+            <>
+              <h4 className="font-semibold mb-3">Final Standings</h4>
+              <div className="space-y-2">
+                {getRankedPlayers(tournament).map((player, index) => (
+                  <div key={player.id} className="flex items-center justify-between py-2">
+                    <div className="flex items-center">
+                      <span className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                        {index + 1}
+                      </span>
+                      <span className={index === 0 ? 'font-semibold text-yellow-600' : ''}>
+                        {player.name}
+                      </span>
+                    </div>
+                    <span className="font-semibold">
+                      {player.totalScore - 147}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-gray-600">Winner: <span className="font-semibold text-yellow-600">{winner?.name}</span></p>
+              <p className="text-gray-500 text-sm">Score: {winner ? winner.totalScore - 147 : 'N/A'} from max</p>
+              <p className="text-gray-400 text-xs mt-2">Full tournament details not available</p>
+            </div>
+          )}
 
           {tournament.isFinalized && (
             <div className="mt-4 p-3 bg-green-100 rounded-lg">
