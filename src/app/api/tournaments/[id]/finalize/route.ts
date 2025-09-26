@@ -12,7 +12,7 @@ export async function POST(_: Request, context: any) {
 
     // Build per-player, per-round scores from matches (same logic as assembleTournament)
     const playerScoresByRound: Record<number, number[]> = {};
-    players.forEach((p) => { playerScoresByRound[p.id] = new Array(7).fill(0); });
+    players.forEach((p: { id: number; name: string }) => { playerScoresByRound[p.id] = new Array(7).fill(0); });
     
     for (const m of matches) {
       const r = Math.max(1, Math.min(7, Number(m.round || 1))) - 1;
