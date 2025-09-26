@@ -26,7 +26,7 @@ export async function GET() {
         id: row.id,
         accessCode: row.access_code,
         date: row.date,
-        players: players.map(p => ({
+        players: players.map((p: { id: number; name: string; total_score: number }) => ({
           id: p.id,
           name: p.name,
           scores: new Array(7).fill(0), // Not needed for history display
