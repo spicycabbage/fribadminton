@@ -14,7 +14,7 @@ export async function GET() {
     `;
 
     // Convert to Tournament objects with minimal data needed for history
-    const tournaments: Tournament[] = rows.map(tr => ({
+    const tournaments: Tournament[] = rows.map((tr: DbTournamentRow) => ({
       id: tr.id,
       accessCode: tr.access_code,
       date: tr.date,

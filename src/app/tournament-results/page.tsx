@@ -105,18 +105,6 @@ export default function TournamentResultsPage() {
               <p className="text-gray-600 text-sm">
                 {tournaments.length} completed tournament{tournaments.length !== 1 ? 's' : ''}
               </p>
-              <button
-                onClick={() => {
-                  if (confirm('Clear all tournament history from this device?')) {
-                    localStorage.removeItem('tournamentHistory');
-                    localStorage.removeItem('currentTournament');
-                    window.location.reload();
-                  }
-                }}
-                className="mt-2 bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600"
-              >
-                Clear Cache
-              </button>
             </div>
 
             <div className="space-y-4">
