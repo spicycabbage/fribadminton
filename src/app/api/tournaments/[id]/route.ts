@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server';
-import { assembleTournament } from '@/lib/tournamentRepo';
+import { ensureSchema, sql } from '@/lib/db';
 
-// helper moved to src/lib/tournamentRepo.ts to satisfy Next route export rules
-
-export async function GET(_: Request, context: any) {
+export async function DELETE(_: Request, context: any) {
+  const { params } = context || { params: { id: '' } };
   try {
-    const { params } = context || { params: { id: '' } };
-    const t = await assembleTournament(params.id);
-    if (!t) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    return NextResponse.json(t);
+    await ensureSchema();
+    
+    // Delete the tournament (cascade will handle players and matches)
+    const result = await sql`delete from tournaments where id=${params.id}`;
+    
+    return NextResponse.json({ success: true, message: 'Tournament deleted successfully' });
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Server error' }, { status: 500 });
   }
 }
-
-
