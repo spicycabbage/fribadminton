@@ -20,9 +20,14 @@ export default function AnalyticsPage() {
     const loadPlayerStats = async () => {
       try {
         const response = await fetch('/api/analytics/player-stats', { cache: 'no-store' });
+        console.log('Analytics API response status:', response.status);
         if (response.ok) {
           const stats = await response.json();
+          console.log('Analytics data:', stats);
           setPlayerStats(stats);
+        } else {
+          const errorText = await response.text();
+          console.error('Analytics API error:', response.status, errorText);
         }
       } catch (error) {
         console.error('Failed to load player stats:', error);
