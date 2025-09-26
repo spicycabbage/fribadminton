@@ -91,7 +91,7 @@ export default function TournamentPage() {
     });
   }, [params]);
 
-  const handleScoreUpdate = (matchId: number, scoreA: number, scoreB: number, isEdit: boolean = false) => {
+  const handleScoreUpdate = async (matchId: number, scoreA: number, scoreB: number, isEdit: boolean = false) => {
     if (!tournament) return;
 
     if (tournament.isFinalized) return; // guard: no updates after finalize
@@ -102,6 +102,17 @@ export default function TournamentPage() {
     
     // Then update the UI state
     setTournament(updatedTournament);
+
+    // Save to database
+    try {
+      await fetch(`/api/tournaments/${tournament.id}/score`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId, scoreA, scoreB }),
+      });
+    } catch (error) {
+      console.error('Failed to save score to database:', error);
+    }
 
     // Broadcast to all viewers (creator, joiners, spectators)
     try {
