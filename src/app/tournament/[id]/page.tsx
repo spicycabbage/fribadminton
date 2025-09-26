@@ -105,11 +105,19 @@ export default function TournamentPage() {
 
     // Save to database
     try {
-      await fetch(`/api/tournaments/${tournament.id}/score`, {
+      console.log(`Saving score: Match ${matchId}, Score ${scoreA}-${scoreB}`);
+      const response = await fetch(`/api/tournaments/${tournament.id}/score`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ matchId, scoreA, scoreB }),
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('API Error:', response.status, error);
+      } else {
+        console.log('Score saved successfully');
+      }
     } catch (error) {
       console.error('Failed to save score to database:', error);
     }
