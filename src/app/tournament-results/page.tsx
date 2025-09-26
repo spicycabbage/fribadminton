@@ -140,7 +140,7 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
               <span className="font-semibold">{winner.name}</span>
             </div>
             <p className="text-sm text-gray-600">
-              {winner.totalScore} points
+              {winner.totalScore - 147} from max
             </p>
           </div>
         </div>
@@ -162,7 +162,7 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
                   </span>
                 </div>
                 <span className="font-semibold">
-                  {player.totalScore}
+                  {player.totalScore - 147}
                 </span>
               </div>
             ))}

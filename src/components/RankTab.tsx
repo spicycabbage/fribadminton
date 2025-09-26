@@ -73,13 +73,8 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="bg-black text-white px-3 py-2 rounded font-bold">
-                  {player.totalScore}
-                </div>
-                <div className="bg-gray-600 text-white px-3 py-2 rounded font-bold">
-                  {player.totalScore - 147}
-                </div>
+              <div className="bg-gray-600 text-white px-3 py-2 rounded font-bold">
+                {player.totalScore - 147}
               </div>
             </div>
           ))}
