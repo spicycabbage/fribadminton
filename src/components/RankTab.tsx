@@ -73,8 +73,13 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
                   </div>
                 </div>
               </div>
-              <div className="bg-black text-white px-3 py-2 rounded font-bold">
-                {player.totalScore}
+              <div className="flex items-center space-x-2">
+                <div className="bg-black text-white px-3 py-2 rounded font-bold">
+                  {player.totalScore}
+                </div>
+                <div className="bg-gray-600 text-white px-3 py-2 rounded font-bold">
+                  {player.totalScore - 147}
+                </div>
               </div>
             </div>
           ))}
@@ -84,23 +89,25 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
         <div className="bg-gray-50 rounded-lg p-3 mb-6">
           <h4 className="font-bold mb-3 text-center">Round Scores</h4>
           <div className="text-[11px]">
-            <div className="grid grid-cols-[repeat(7,2rem)_2.5rem] items-center font-semibold border-b pb-1">
+            <div className="grid grid-cols-[repeat(7,2rem)_2.5rem_2.5rem] items-center font-semibold border-b pb-1">
               {[1, 2, 3, 4, 5, 6, 7].map((round) => (
                 <div key={round} className="text-center">R{round}</div>
               ))}
               <div className="text-center">Total</div>
+              <div className="text-center">Diff</div>
             </div>
             <div>
               {rankedPlayers.map((player) => (
                 <div key={player.id} className="border-b py-1">
                   <div className="truncate pr-1 font-medium mb-1 text-[12px]">{player.name}</div>
-                  <div className="grid grid-cols-[repeat(7,2rem)_2.5rem] items-center">
+                  <div className="grid grid-cols-[repeat(7,2rem)_2.5rem_2.5rem] items-center">
                     {[0, 1, 2, 3, 4, 5, 6].map((roundIndex) => (
                       <div key={roundIndex} className="text-center">
                         {player.scores[roundIndex] || '-'}
                       </div>
                     ))}
                     <div className="text-center font-bold">{player.totalScore}</div>
+                    <div className="text-center font-bold">{player.totalScore - 147}</div>
                   </div>
                 </div>
               ))}
