@@ -27,7 +27,11 @@ export async function assembleTournament(id: string): Promise<Tournament | null>
     id: tr.id,
     accessCode: tr.access_code,
     date: tr.date,
-    players: players.map((p: { id: number; name: string; total_score: number }) => ({ id: p.id, name: p.name, scores: playerScoresByRound[p.id] || new Array(7).fill(0), totalScore: p.total_score })),
+    players: players.map((p: { id: number; name: string; total_score: number }) => {
+      const scores = playerScoresByRound[p.id] || new Array(7).fill(0);
+      const calculatedTotal = scores.reduce((sum, score) => sum + score, 0);
+      return { id: p.id, name: p.name, scores, totalScore: calculatedTotal };
+    }),
     matches: matches.map((m: { id: number; round: number; team_a_p1: number; team_a_p2: number; team_b_p1: number; team_b_p2: number; score_a: number | null; score_b: number | null; completed: boolean; winner_team?: string | null }) => ({
       id: m.id,
       round: m.round,
