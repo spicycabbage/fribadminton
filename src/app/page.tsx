@@ -76,12 +76,14 @@ export default function HomePage() {
             </button>
           </Link>
 
-          <button 
-            className="w-full bg-gray-300 text-gray-600 py-4 rounded-lg font-semibold text-lg cursor-not-allowed"
-            disabled
+          <Link 
+            href="/analytics" 
+            className="block w-full"
           >
-            Advanced Analytics - Coming Soon
-          </button>
+            <button className="w-full bg-purple-500 text-white py-4 rounded-lg font-semibold text-lg hover:bg-purple-600 transition-colors">
+              Advanced Analytics
+            </button>
+          </Link>
         </div>
       </div>
 
