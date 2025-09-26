@@ -123,7 +123,7 @@ export default function AnalyticsPage() {
           ) : (
             <div className="space-y-3">
               {/* Header */}
-              <div className="grid grid-cols-[2fr_3rem_3rem_3.5rem_3.5rem] gap-1 px-3 py-2 bg-gray-100 rounded-lg text-xs font-semibold text-gray-600">
+              <div className="grid grid-cols-[2fr_0.8fr_0.8fr_1fr_1fr] gap-1 px-3 py-2 bg-gray-100 rounded-lg text-xs font-semibold text-gray-600">
                 <div>Player</div>
                 <div className="text-center">W</div>
                 <div className="text-center">L</div>
@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
 
               {/* Player Stats */}
               {playerStats.map((player, index) => (
-                <div key={player.name} className="grid grid-cols-[2fr_3rem_3rem_3.5rem_3.5rem] gap-1 px-3 py-3 bg-gray-50 rounded-lg items-center">
+                <div key={player.name} className="grid grid-cols-[2fr_0.8fr_0.8fr_1fr_1fr] gap-1 px-3 py-3 bg-gray-50 rounded-lg items-center">
                   <div className="flex items-center">
                     <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-semibold mr-3">
                       {index + 1}
@@ -146,10 +146,10 @@ export default function AnalyticsPage() {
                       {player.name}
                     </button>
                   </div>
-                  <div className="text-center font-semibold text-green-600 flex items-center justify-center">{player.wins}</div>
-                  <div className="text-center font-semibold text-red-600 flex items-center justify-center">{player.losses}</div>
-                  <div className="text-center font-semibold flex items-center justify-center">{player.totalMatches}</div>
-                  <div className="text-center flex items-center justify-center">
+                  <div className="text-center font-semibold text-green-600">{player.wins}</div>
+                  <div className="text-center font-semibold text-red-600">{player.losses}</div>
+                  <div className="text-center font-semibold">{player.totalMatches}</div>
+                  <div className="text-center">
                     <span className={`font-semibold ${
                       player.winPercentage >= 70 ? 'text-green-600' :
                       player.winPercentage >= 50 ? 'text-yellow-600' :
@@ -207,7 +207,7 @@ export default function AnalyticsPage() {
               ) : (
                 <div className="space-y-3">
                   {/* Header */}
-                  <div className="grid grid-cols-[2fr_2.5rem_2.5rem_3rem_3rem_3.5rem] gap-1 px-2 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-600">
+                  <div className="grid grid-cols-[2fr_0.6fr_0.6fr_0.8fr_0.8fr_1fr] gap-1 px-2 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-600">
                     <div>Opponent</div>
                     <div className="text-center">W</div>
                     <div className="text-center">L</div>
@@ -218,12 +218,12 @@ export default function AnalyticsPage() {
 
                   {/* Head-to-Head Records */}
                   {headToHeadData.map((record) => (
-                    <div key={record.opponent} className="grid grid-cols-[2fr_2.5rem_2.5rem_3rem_3rem_3.5rem] gap-1 px-2 py-2 bg-gray-50 rounded items-center">
+                    <div key={record.opponent} className="grid grid-cols-[2fr_0.6fr_0.6fr_0.8fr_0.8fr_1fr] gap-1 px-2 py-2 bg-gray-50 rounded items-center">
                       <div className="font-semibold truncate">{record.opponent}</div>
-                      <div className="text-center font-semibold text-green-600 flex items-center justify-center">{record.wins}</div>
-                      <div className="text-center font-semibold text-red-600 flex items-center justify-center">{record.losses}</div>
-                      <div className="text-center font-semibold flex items-center justify-center">{record.totalMatches}</div>
-                      <div className="text-center flex items-center justify-center">
+                      <div className="text-center font-semibold text-green-600">{record.wins}</div>
+                      <div className="text-center font-semibold text-red-600">{record.losses}</div>
+                      <div className="text-center font-semibold">{record.totalMatches}</div>
+                      <div className="text-center">
                         <span className={`font-semibold ${
                           record.winPercentage >= 70 ? 'text-green-600' :
                           record.winPercentage >= 50 ? 'text-yellow-600' :
@@ -232,7 +232,7 @@ export default function AnalyticsPage() {
                           {record.winPercentage}%
                         </span>
                       </div>
-                      <div className="text-center flex items-center justify-center">
+                      <div className="text-center">
                         <span className={`font-semibold ${
                           record.avgMargin > 0 ? 'text-green-600' :
                           record.avgMargin < 0 ? 'text-red-600' :
