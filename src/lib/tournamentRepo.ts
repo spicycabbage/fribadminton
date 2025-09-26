@@ -7,7 +7,7 @@ export async function assembleTournament(id: string): Promise<Tournament | null>
   const tr = rows[0];
   if (!tr) return null;
   const players = await sql<{ id: number; name: string; total_score: number }[]>`select * from players where tournament_id=${id} order by id asc`;
-  const matches = await sql<{ id: number; round: number; team_a_p1: number; team_a_p2: number; team_b_p1: number; team_b_p2: number; score_a: number | null; score_b: number | null; completed: boolean }[]>`select * from matches where tournament_id=${id} order by id asc`;
+  const matches = await sql<{ id: number; round: number; team_a_p1: number; team_a_p2: number; team_b_p1: number; team_b_p2: number; score_a: number | null; score_b: number | null; completed: boolean; winner_team?: string | null }[]>`select * from matches where tournament_id=${id} order by id asc`;
 
   // Build per-player, per-round scores from matches
   const playerScoresByRound: Record<number, number[]> = {};
@@ -32,7 +32,7 @@ export async function assembleTournament(id: string): Promise<Tournament | null>
       const calculatedTotal = scores.reduce((sum, score) => sum + score, 0);
       return { id: p.id, name: p.name, scores, totalScore: calculatedTotal };
     }),
-    matches: matches.map((m: { id: number; round: number; team_a_p1: number; team_a_p2: number; team_b_p1: number; team_b_p2: number; score_a: number | null; score_b: number | null; completed: boolean }) => ({
+    matches: matches.map((m: { id: number; round: number; team_a_p1: number; team_a_p2: number; team_b_p1: number; team_b_p2: number; score_a: number | null; score_b: number | null; completed: boolean; winner_team?: string | null }) => ({
       id: m.id,
       round: m.round,
       teamA: { player1: m.team_a_p1, player2: m.team_a_p2 },
@@ -40,7 +40,7 @@ export async function assembleTournament(id: string): Promise<Tournament | null>
       scoreA: m.score_a,
       scoreB: m.score_b,
       completed: m.completed,
-      winnerTeam: null, // Remove winner_team dependency
+      winnerTeam: (m.winner_team === 'A' || m.winner_team === 'B') ? (m.winner_team as 'A' | 'B') : null,
     })),
     currentRound: tr.current_round,
     isFinalized: tr.is_finalized,

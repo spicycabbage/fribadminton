@@ -46,6 +46,13 @@ export function ensureSchema(): Promise<void> {
       primary key (tournament_id, id),
       foreign key (tournament_id) references tournaments(id) on delete cascade
     )`;
+    
+    // Add winner_team column if it doesn't exist (for existing databases)
+    try {
+      await sql`alter table matches add column if not exists winner_team text`;
+    } catch (e) {
+      // Column might already exist, ignore error
+    }
   })();
   return schemaReady;
 }

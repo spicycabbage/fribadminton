@@ -15,7 +15,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     if (!match) return NextResponse.json({ error: 'Match not found' }, { status: 404 });
 
     // Update match
-    await sql`update matches set score_a=${scoreA}, score_b=${scoreB}, completed=true where tournament_id=${params.id} and id=${matchId}`;
+    const winner = Number(scoreA) === 21 ? 'A' : 'B';
+    await sql`update matches set score_a=${scoreA}, score_b=${scoreB}, completed=true, winner_team=${winner} where tournament_id=${params.id} and id=${matchId}`;
 
     // Update player totals for that round
     const round = match.round as number;
