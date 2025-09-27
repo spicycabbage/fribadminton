@@ -28,108 +28,139 @@ export async function POST(req: Request) {
     //   return NextResponse.json(cachedRecords);
     // }
     
-    // Single optimized query to get all head-to-head records
-    const headToHeadRecords = await sql<{
-      opponent: string;
-      wins: number;
-      losses: number;
-      total_matches: number;
-      win_percentage: number;
-      avg_margin: number;
-    }[]>`
-      WITH opponent_matches AS (
-        SELECT 
-          -- Get opponent names: if player is on team A, opponents are on team B and vice versa
-          CASE 
-            WHEN p1.name = ${playerName} THEN 
-              CASE WHEN p3.name != ${playerName} THEN p3.name ELSE p4.name END
-            WHEN p2.name = ${playerName} THEN 
-              CASE WHEN p3.name != ${playerName} THEN p3.name ELSE p4.name END
-            WHEN p3.name = ${playerName} THEN 
-              CASE WHEN p1.name != ${playerName} THEN p1.name ELSE p2.name END
-            WHEN p4.name = ${playerName} THEN 
-              CASE WHEN p1.name != ${playerName} THEN p1.name ELSE p2.name END
-          END as opponent_name,
-          CASE 
-            -- Player is on team A and team A wins
-            WHEN (p1.name = ${playerName} OR p2.name = ${playerName}) AND m.winner_team = 'A' THEN 1
-            -- Player is on team B and team B wins
-            WHEN (p3.name = ${playerName} OR p4.name = ${playerName}) AND m.winner_team = 'B' THEN 1
-            ELSE 0
-          END as is_win,
-          CASE 
-            -- Player is on team A
-            WHEN p1.name = ${playerName} OR p2.name = ${playerName} THEN m.score_a - m.score_b
-            -- Player is on team B
-            WHEN p3.name = ${playerName} OR p4.name = ${playerName} THEN m.score_b - m.score_a
-            ELSE 0
-          END as margin
+    // Revert to the original working logic but optimized
+    // Get all finalized tournaments
+    const tournaments = await sql<{ id: string }[]>`
+      SELECT id FROM tournaments 
+      WHERE is_finalized = true
+    `;
+
+    if (tournaments.length === 0) {
+      return NextResponse.json([]);
+    }
+
+    const tournamentIds = tournaments.map((t: { id: string }) => t.id);
+    
+    // Get all opponents this player has faced (players on opposing teams)
+    const opponents = await sql<{ name: string }[]>`
+      SELECT DISTINCT p2.name
+      FROM players p1
+      JOIN matches m ON p1.tournament_id = m.tournament_id
+      JOIN players p2 ON m.tournament_id = p2.tournament_id
+      WHERE p1.name = ${playerName}
+        AND p1.tournament_id = ANY(${tournamentIds})
+        AND p2.tournament_id = ANY(${tournamentIds})
+        AND p2.name != ${playerName}
+        AND m.completed = true 
+        AND m.winner_team IS NOT NULL
+        AND (
+          -- p1 and p2 are on opposite teams
+          ((m.team_a_p1 = p1.id OR m.team_a_p2 = p1.id) AND (m.team_b_p1 = p2.id OR m.team_b_p2 = p2.id)) OR
+          ((m.team_b_p1 = p1.id OR m.team_b_p2 = p1.id) AND (m.team_a_p1 = p2.id OR m.team_a_p2 = p2.id))
+        )
+      ORDER BY p2.name
+    `;
+
+    const headToHeadRecords: HeadToHeadRecord[] = [];
+
+    for (const opponent of opponents) {
+      let wins = 0;
+      let losses = 0;
+      let totalMargin = 0;
+
+      // Get all matches where these two players faced each other (on opposite teams)
+      const matches = await sql<{ 
+        winner_team: string; 
+        team_a_p1: number; 
+        team_a_p2: number; 
+        team_b_p1: number; 
+        team_b_p2: number; 
+        score_a: number; 
+        score_b: number;
+        tournament_id: string;
+      }[]>`
+        SELECT DISTINCT m.winner_team, m.team_a_p1, m.team_a_p2, m.team_b_p1, m.team_b_p2, m.score_a, m.score_b, m.tournament_id
         FROM matches m
-        JOIN tournaments t ON m.tournament_id = t.id
-        JOIN players p1 ON m.tournament_id = p1.tournament_id AND m.team_a_p1 = p1.id
-        JOIN players p2 ON m.tournament_id = p2.tournament_id AND m.team_a_p2 = p2.id
-        JOIN players p3 ON m.tournament_id = p3.tournament_id AND m.team_b_p1 = p3.id
-        JOIN players p4 ON m.tournament_id = p4.tournament_id AND m.team_b_p2 = p4.id
-        WHERE t.is_finalized = true 
+        JOIN players p1 ON m.tournament_id = p1.tournament_id
+        JOIN players p2 ON m.tournament_id = p2.tournament_id
+        WHERE m.tournament_id = ANY(${tournamentIds})
           AND m.completed = true 
           AND m.winner_team IS NOT NULL
           AND m.score_a IS NOT NULL
           AND m.score_b IS NOT NULL
+          AND p1.name = ${playerName}
+          AND p2.name = ${opponent.name}
           AND (
-            -- Player must be in the match (on either team)
-            p1.name = ${playerName} OR p2.name = ${playerName} OR 
-            p3.name = ${playerName} OR p4.name = ${playerName}
+            -- Player 1 on team A, Player 2 on team B
+            ((m.team_a_p1 = p1.id OR m.team_a_p2 = p1.id) AND (m.team_b_p1 = p2.id OR m.team_b_p2 = p2.id)) OR
+            -- Player 1 on team B, Player 2 on team A
+            ((m.team_b_p1 = p1.id OR m.team_b_p2 = p1.id) AND (m.team_a_p1 = p2.id OR m.team_a_p2 = p2.id))
           )
-          -- Ensure it's actually a head-to-head match (player vs opponent, not as partners)
-          AND (
-            -- Player on team A, opponent on team B
-            ((p1.name = ${playerName} OR p2.name = ${playerName}) AND 
-             (p3.name != ${playerName} AND p4.name != ${playerName})) OR
-            -- Player on team B, opponent on team A
-            ((p3.name = ${playerName} OR p4.name = ${playerName}) AND 
-             (p1.name != ${playerName} AND p2.name != ${playerName}))
-          )
-      )
-      SELECT 
-        opponent_name as opponent,
-        SUM(is_win)::integer as wins,
-        (COUNT(*) - SUM(is_win))::integer as losses,
-        COUNT(*)::integer as total_matches,
-        CASE 
-          WHEN COUNT(*) > 0 THEN ROUND((SUM(is_win)::float / COUNT(*)) * 100)::integer
-          ELSE 0
-        END as win_percentage,
-        CASE 
-          WHEN COUNT(*) > 0 THEN ROUND((SUM(margin)::float / COUNT(*)) * 10) / 10
-          ELSE 0
-        END as avg_margin
-      FROM opponent_matches
-      WHERE opponent_name IS NOT NULL AND opponent_name != ${playerName}
-      GROUP BY opponent_name
-      ORDER BY win_percentage DESC, total_matches DESC
-    `;
+      `;
 
-    // Convert to the expected format
-    const formattedRecords: HeadToHeadRecord[] = headToHeadRecords.map((record: {
-      opponent: string;
-      wins: number;
-      losses: number;
-      total_matches: number;
-      win_percentage: number;
-      avg_margin: number;
-    }) => ({
-      opponent: record.opponent,
-      wins: record.wins,
-      losses: record.losses,
-      totalMatches: record.total_matches,
-      winPercentage: record.win_percentage,
-      avgMargin: record.avg_margin
-    }));
+      for (const match of matches) {
+        // Get player IDs for this tournament
+        const [playerRecord] = await sql<{ id: number }[]>`
+          SELECT id FROM players 
+          WHERE tournament_id = ${match.tournament_id} AND name = ${playerName}
+          LIMIT 1
+        `;
+        
+        if (!playerRecord) continue;
+        const playerId = playerRecord.id;
+        
+        const p1IsTeamA = match.team_a_p1 === playerId || match.team_a_p2 === playerId;
+        const p1IsTeamB = match.team_b_p1 === playerId || match.team_b_p2 === playerId;
+        
+        // Calculate margin from player's perspective
+        let margin = 0;
+        if (p1IsTeamA) {
+          margin = match.score_a - match.score_b; // Positive if player won
+        } else if (p1IsTeamB) {
+          margin = match.score_b - match.score_a; // Positive if player won
+        }
+        
+        totalMargin += margin;
+        
+        if (match.winner_team === 'A' && p1IsTeamA) {
+          wins++;
+        } else if (match.winner_team === 'B' && p1IsTeamB) {
+          wins++;
+        } else if ((match.winner_team === 'A' && p1IsTeamB) || (match.winner_team === 'B' && p1IsTeamA)) {
+          losses++;
+        }
+      }
+
+      const totalMatches = wins + losses;
+      if (totalMatches > 0) {
+        const winPercentage = Math.round((wins / totalMatches) * 100);
+        const avgMargin = Math.round((totalMargin / totalMatches) * 10) / 10;
+        
+        headToHeadRecords.push({
+          opponent: opponent.name,
+          wins,
+          losses,
+          totalMatches,
+          winPercentage,
+          avgMargin
+        });
+      }
+    }
+
+    // Sort by win percentage (descending), then by total matches (descending)
+    headToHeadRecords.sort((a, b) => {
+      if (b.winPercentage !== a.winPercentage) {
+        return b.winPercentage - a.winPercentage;
+      }
+      return b.totalMatches - a.totalMatches;
+    });
+
+    // headToHeadRecords is already in the correct format
 
     // Cache the results
-    analyticsCache.set(cacheKey, formattedRecords, CACHE_TTL);
+    analyticsCache.set(cacheKey, headToHeadRecords, CACHE_TTL);
 
-    return NextResponse.json(formattedRecords);
+    return NextResponse.json(headToHeadRecords);
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Server error' }, { status: 500 });
   }
