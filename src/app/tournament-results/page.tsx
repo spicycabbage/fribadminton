@@ -296,50 +296,52 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
         </p>
       </div>
 
-      <div className="overflow-x-auto">
-        <div className="min-w-full">
-          {/* Header */}
-          <div className="flex bg-gray-100 rounded-t-lg text-xs font-semibold text-gray-600 sticky left-0">
-            <div className="flex-shrink-0 w-32 px-3 py-2 bg-gray-100 sticky left-0 z-10 border-r border-gray-200">
-              Player
-            </div>
-            <div className="flex">
-              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">1st</div>
-              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">2nd</div>
-              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">3rd</div>
-              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">4th</div>
-              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">5th</div>
-              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">6th</div>
-              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">7th</div>
-              <div className="w-12 px-2 py-2 text-center">8th</div>
-            </div>
-          </div>
-
-          {/* Player Stats */}
-          {playerStats.map((player) => (
-            <div key={player.name} className="flex bg-gray-50 border-t border-gray-200">
-              <div className="flex-shrink-0 w-32 px-3 py-3 bg-gray-50 sticky left-0 z-10 border-r border-gray-200">
-                <div className="flex flex-col">
-                  <span className="font-semibold truncate text-sm">{player.name}</span>
-                  <span className="text-xs text-gray-500">({player.totalTournaments})</span>
-                </div>
-              </div>
-              <div className="flex">
-                {player.finishes.map((count, position) => (
-                  <div key={position} className={`w-12 px-2 py-3 text-center border-r border-gray-200 ${position === 7 ? 'border-r-0' : ''} ${getPositionBg(position)}`}>
-                    <span className={`text-xs font-semibold ${getPositionColor(position)}`}>
-                      {count || '-'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+      <div className="relative">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            {/* Header */}
+            <thead>
+              <tr className="bg-gray-100 text-xs font-semibold text-gray-600">
+                <th className="sticky left-0 z-20 bg-gray-100 w-32 px-3 py-2 text-left border-r border-gray-200">
+                  Player
+                </th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">1st</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">2nd</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">3rd</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">4th</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">5th</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">6th</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">7th</th>
+                <th className="w-12 px-2 py-2 text-center">8th</th>
+              </tr>
+            </thead>
+            
+            {/* Player Stats */}
+            <tbody>
+              {playerStats.map((player) => (
+                <tr key={player.name} className="bg-gray-50 border-t border-gray-200">
+                  <td className="sticky left-0 z-10 bg-gray-50 w-32 px-3 py-3 border-r border-gray-200">
+                    <div className="flex items-center">
+                      <span className="font-semibold truncate text-sm mr-1">{player.name}</span>
+                      <span className="text-xs text-gray-500">({player.totalTournaments})</span>
+                    </div>
+                  </td>
+                  {player.finishes.map((count, position) => (
+                    <td key={position} className={`w-12 px-2 py-3 text-center border-r border-gray-200 ${position === 7 ? 'border-r-0' : ''} ${getPositionBg(position)}`}>
+                      <span className={`text-xs font-semibold ${getPositionColor(position)}`}>
+                        {count || '-'}
+                      </span>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         
         {/* Scroll hint */}
         <div className="mt-2 text-center">
-          <p className="text-xs text-gray-500">← Scroll horizontally to see positions 4-8 →</p>
+          <p className="text-xs text-gray-500">← Scroll horizontally to see positions 5-8 →</p>
         </div>
       </div>
 
