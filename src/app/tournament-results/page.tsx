@@ -268,9 +268,9 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
 
   const getPositionBg = (position: number) => {
     switch (position) {
-      case 0: return 'bg-yellow-50'; // 1st
-      case 1: return 'bg-gray-50'; // 2nd
-      case 2: return 'bg-amber-50'; // 3rd
+      case 0: return 'bg-yellow-100'; // 1st - Gold
+      case 1: return 'bg-gray-200'; // 2nd - Silver
+      case 2: return 'bg-orange-100'; // 3rd - Bronze
       default: return 'bg-gray-50';
     }
   };
@@ -305,9 +305,9 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
                 <th className="sticky left-0 z-20 bg-gray-100 w-32 px-3 py-2 text-left border-r border-gray-200">
                   Player
                 </th>
-                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">1st</th>
-                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">2nd</th>
-                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">3rd</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200 bg-yellow-100">1st</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200 bg-gray-200">2nd</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200 bg-orange-100">3rd</th>
                 <th className="w-12 px-2 py-2 text-center border-r border-gray-200">4th</th>
                 <th className="w-12 px-2 py-2 text-center border-r border-gray-200">5th</th>
                 <th className="w-12 px-2 py-2 text-center border-r border-gray-200">6th</th>
