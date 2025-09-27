@@ -195,7 +195,7 @@ export function getRankedPlayers(tournament: Tournament): Player[] {
     .sort((a, b) => b.totalScore - a.totalScore);
   
   // Handle ties properly
-  const rankedPlayers = [];
+  const rankedPlayers: Player[] = [];
   
   for (let i = 0; i < sortedPlayers.length; i++) {
     const player = sortedPlayers[i];
