@@ -23,9 +23,9 @@ export default function DeleteTournamentPage() {
       }
     }
 
-    // Sort by date (newest first)
+    // Sort by tournament date (newest first)
     allTournaments.sort((a: Tournament, b: Tournament) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
     setTournaments(allTournaments);

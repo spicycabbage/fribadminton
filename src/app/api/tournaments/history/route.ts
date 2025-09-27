@@ -7,11 +7,11 @@ export async function GET() {
   try {
     await ensureSchema();
     
-    // Get all finalized tournaments ordered by creation date (newest first)
+    // Get all finalized tournaments ordered by tournament date (newest first)
     const rows = await sql<DbTournamentRow[]>`
       SELECT * FROM tournaments 
       WHERE is_finalized = true 
-      ORDER BY created_at DESC
+      ORDER BY date DESC
     `;
 
     // Use assembleTournament to get complete tournament data (same as before)

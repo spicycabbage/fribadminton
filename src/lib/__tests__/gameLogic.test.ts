@@ -88,6 +88,37 @@ describe('Game Logic', () => {
       expect(ranked[0].name).toBe('Bob'); // Higher score
       expect(ranked[1].name).toBe('Alice'); // Lower score
     });
+
+    it('should handle ties correctly', () => {
+      const tournament = createTournament('123', playerNames);
+      
+      // Set up tie scenario: -4, -4, -8 (from max score of 147)
+      tournament.players[0].totalScore = 143; // -4 from 147
+      tournament.players[1].totalScore = 143; // -4 from 147 (tie for 1st)
+      tournament.players[2].totalScore = 139; // -8 from 147 (3rd place)
+      tournament.players[3].totalScore = 135; // -12 from 147 (4th place)
+      tournament.players[4].totalScore = 135; // -12 from 147 (tie for 4th)
+      tournament.players[5].totalScore = 130; // -17 from 147 (6th place)
+      tournament.players[6].totalScore = 125; // -22 from 147 (7th place)
+      tournament.players[7].totalScore = 120; // -27 from 147 (8th place)
+      
+      const ranked = getRankedPlayers(tournament);
+      
+      // Check tied players get same rank
+      expect(ranked[0].rank).toBe(1); // First player with score 143
+      expect(ranked[1].rank).toBe(1); // Second player with score 143 (tied for 1st)
+      expect(ranked[2].rank).toBe(3); // Player with score 139 (3rd place, skipping 2nd)
+      expect(ranked[3].rank).toBe(4); // First player with score 135
+      expect(ranked[4].rank).toBe(4); // Second player with score 135 (tied for 4th)
+      expect(ranked[5].rank).toBe(6); // Player with score 130 (6th place, skipping 5th)
+      expect(ranked[6].rank).toBe(7); // Player with score 125
+      expect(ranked[7].rank).toBe(8); // Player with score 120
+      
+      // Verify scores are sorted correctly
+      expect(ranked[0].totalScore).toBe(143);
+      expect(ranked[1].totalScore).toBe(143);
+      expect(ranked[2].totalScore).toBe(139);
+    });
   });
 
   describe('ROUND_MATCHUPS', () => {

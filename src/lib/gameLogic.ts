@@ -3,6 +3,7 @@ export interface Player {
   name: string;
   scores: number[];
   totalScore: number;
+  rank?: number; // Optional rank property for ranked players
 }
 
 export interface Match {
@@ -190,9 +191,25 @@ export function updateMatchScore(
 }
 
 export function getRankedPlayers(tournament: Tournament): Player[] {
-  return [...tournament.players]
-    .sort((a, b) => b.totalScore - a.totalScore)
-    .map((player, index) => ({ ...player, rank: index + 1 }));
+  const sortedPlayers = [...tournament.players]
+    .sort((a, b) => b.totalScore - a.totalScore);
+  
+  // Handle ties properly
+  const rankedPlayers = [];
+  
+  for (let i = 0; i < sortedPlayers.length; i++) {
+    const player = sortedPlayers[i];
+    
+    // If this player has the same score as the previous player, use the same rank
+    if (i > 0 && sortedPlayers[i - 1].totalScore === player.totalScore) {
+      rankedPlayers.push({ ...player, rank: rankedPlayers[i - 1].rank });
+    } else {
+      // New score, assign rank based on position (1-based)
+      rankedPlayers.push({ ...player, rank: i + 1 });
+    }
+  }
+  
+  return rankedPlayers;
 }
 
 export function generateTournamentId(): string {

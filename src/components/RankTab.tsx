@@ -55,17 +55,17 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
             <div
               key={player.id}
               className={`flex items-center justify-between h-14 px-6 py-3 rounded-lg ${
-                index === 0 
+                player.rank === 1 
                   ? 'bg-yellow-50 border-2 border-yellow-300' 
                   : 'bg-gray-50 border border-gray-200'
               }`}
             >
               <div className="flex items-center">
-                {getRankIcon(index + 1)}
+                {getRankIcon(player.rank)}
                 <div className="ml-3">
                   <div className="flex items-center">
                     <span className="text-sm font-semibold text-gray-600 mr-2">
-                      {getRankDisplay(index + 1)}
+                      {getRankDisplay(player.rank)}
                     </span>
                     <span className="font-semibold">
                       {player.name}
