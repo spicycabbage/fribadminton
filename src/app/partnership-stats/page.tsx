@@ -10,7 +10,6 @@ interface PartnershipStats {
   losses: number;
   winPercentage: number;
   avgMarginVictory: number;
-  avgMarginDefeat: number;
 }
 
 interface PartnershipMatch {
@@ -105,64 +104,65 @@ export default function PartnershipStatsPage() {
       {/* Content */}
       <div className="bg-white mx-[4%] mb-[4%] rounded-b-xl flex-1">
         <div className="p-4">
-
-        {/* Player Selection */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select First Player
-            </label>
-            <select
-              value={player1}
-              onChange={(e) => {
-                setPlayer1(e.target.value);
-                if (e.target.value === player2) {
-                  setPlayer2('');
-                }
-              }}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Choose a player...</option>
-              {players.map((player) => (
-                <option key={player} value={player}>
-                  {player}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Second Player
-            </label>
-            <select
-              value={player2}
-              onChange={(e) => setPlayer2(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={!player1}
-            >
-              <option value="">Choose a partner...</option>
-              {availablePlayer2Options.map((player) => (
-                <option key={player} value={player}>
-                  {player}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            onClick={handleSearch}
-            disabled={!player1 || !player2 || loading}
-            className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Searching...' : 'Get Partnership Stats'}
-          </button>
-
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
+          {/* Player Selection */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select First Player
+              </label>
+              <select
+                value={player1}
+                onChange={(e) => {
+                  setPlayer1(e.target.value);
+                  if (e.target.value === player2) {
+                    setPlayer2('');
+                  }
+                }}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Choose a player...</option>
+                {players.map((player) => (
+                  <option key={player} value={player}>
+                    {player}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Second Player
+              </label>
+              <select
+                value={player2}
+                onChange={(e) => setPlayer2(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!player1}
+              >
+                <option value="">Choose a partner...</option>
+                {availablePlayer2Options.map((player) => (
+                  <option key={player} value={player}>
+                    {player}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={handleSearch}
+              disabled={!player1 || !player2 || loading}
+              className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Searching...' : 'Get Partnership Stats'}
+            </button>
+
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
+            )}
+          </div>
+
           {/* Results */}
           {partnershipData && (
             <div className="mt-6">
