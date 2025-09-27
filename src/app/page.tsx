@@ -84,6 +84,15 @@ export default function HomePage() {
               Advanced Analytics
             </button>
           </Link>
+
+          <Link 
+            href="/partnership-stats" 
+            className="block w-full"
+          >
+            <button className="w-full bg-orange-500 text-white py-4 rounded-lg font-semibold text-lg hover:bg-orange-600 transition-colors">
+              Partnership Statistics
+            </button>
+          </Link>
         </div>
       </div>
 
