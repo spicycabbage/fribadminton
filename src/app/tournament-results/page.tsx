@@ -227,18 +227,22 @@ interface HistoricalFinishesTabProps {
 }
 
 function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
-  // Calculate historical finishes for each player
+  // Calculate historical finishes and average scores for each player
   const playerFinishes: Record<string, number[]> = {};
+  const playerScores: Record<string, number[]> = {};
   
   tournaments.forEach(tournament => {
     const rankedPlayers = getRankedPlayers(tournament);
     rankedPlayers.forEach((player) => {
       if (!playerFinishes[player.name]) {
         playerFinishes[player.name] = new Array(8).fill(0); // positions 1-8
+        playerScores[player.name] = [];
       }
       if (player.rank && player.rank <= 8) { // Only count top 8 positions
         playerFinishes[player.name][player.rank - 1]++; // Use actual rank (convert to 0-based index)
       }
+      // Store the score difference from max (147)
+      playerScores[player.name].push(player.totalScore - 147);
     });
   });
 
@@ -246,7 +250,10 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
   const playerStats = Object.entries(playerFinishes).map(([name, finishes]) => ({
     name,
     finishes,
-    totalTournaments: finishes.reduce((sum, count) => sum + count, 0)
+    totalTournaments: finishes.reduce((sum, count) => sum + count, 0),
+    avgScoreDiff: playerScores[name].length > 0 
+      ? Math.round(playerScores[name].reduce((sum, score) => sum + score, 0) / playerScores[name].length)
+      : 0
   })).sort((a, b) => b.totalTournaments - a.totalTournaments);
 
   const getPositionColor = (position: number) => {
@@ -297,6 +304,7 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
                 <th className="sticky left-0 z-20 bg-gray-100 w-32 px-3 py-2 text-left border-r border-gray-200">
                   Player
                 </th>
+                <th className="w-16 px-2 py-2 text-center border-r border-gray-200 bg-gray-100">Avg</th>
                 <th className="w-12 px-2 py-2 text-center border-r border-gray-200 bg-yellow-100">1st</th>
                 <th className="w-12 px-2 py-2 text-center border-r border-gray-200 bg-gray-200">2nd</th>
                 <th className="w-12 px-2 py-2 text-center border-r border-gray-200 bg-orange-100">3rd</th>
@@ -317,6 +325,11 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
                       <span className="font-semibold truncate text-sm mr-1">{player.name}</span>
                       <span className="text-xs text-gray-500">({player.totalTournaments})</span>
                     </div>
+                  </td>
+                  <td className="w-16 px-2 py-3 text-center border-r border-gray-200 bg-gray-100">
+                    <span className="text-xs font-semibold text-gray-700">
+                      {player.avgScoreDiff >= 0 ? '+' : ''}{player.avgScoreDiff}
+                    </span>
                   </td>
                   {player.finishes.map((count, position) => (
                     <td key={position} className={`w-12 px-2 py-3 text-center border-r border-gray-200 ${position === 7 ? 'border-r-0' : ''} ${getPositionBg(position)}`}>
