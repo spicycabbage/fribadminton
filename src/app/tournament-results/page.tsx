@@ -296,29 +296,29 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
         </p>
       </div>
 
-      <div className="space-y-2">
+      <div className="border border-gray-300 rounded-lg overflow-hidden">
         {/* Header */}
-        <div className="grid grid-cols-[1.5fr_repeat(8,1fr)] gap-0.5 px-2 py-2 bg-gray-100 rounded-lg text-xs font-semibold text-gray-600">
-          <div className="text-xs">Player</div>
-          <div className="text-center text-xs">1st</div>
-          <div className="text-center text-xs">2nd</div>
-          <div className="text-center text-xs">3rd</div>
-          <div className="text-center text-xs">4th</div>
-          <div className="text-center text-xs">5th</div>
-          <div className="text-center text-xs">6th</div>
-          <div className="text-center text-xs">7th</div>
-          <div className="text-center text-xs">8th</div>
+        <div className="grid grid-cols-[1.5fr_repeat(8,1fr)] bg-gray-200 text-xs font-semibold text-gray-700">
+          <div className="px-2 py-2 border-r border-gray-300 bg-gray-200">Player</div>
+          <div className="text-center px-1 py-2 border-r border-gray-300 bg-blue-100">1st</div>
+          <div className="text-center px-1 py-2 border-r border-gray-300 bg-gray-100">2nd</div>
+          <div className="text-center px-1 py-2 border-r border-gray-300 bg-blue-100">3rd</div>
+          <div className="text-center px-1 py-2 border-r border-gray-300 bg-gray-100">4th</div>
+          <div className="text-center px-1 py-2 border-r border-gray-300 bg-blue-100">5th</div>
+          <div className="text-center px-1 py-2 border-r border-gray-300 bg-gray-100">6th</div>
+          <div className="text-center px-1 py-2 border-r border-gray-300 bg-blue-100">7th</div>
+          <div className="text-center px-1 py-2 bg-gray-100">8th</div>
         </div>
 
         {/* Player Stats */}
-        {playerStats.map((player) => (
-          <div key={player.name} className="grid grid-cols-[1.5fr_repeat(8,1fr)] gap-0.5 px-2 py-2 bg-gray-50 rounded-lg items-center">
-            <div className="flex flex-col">
+        {playerStats.map((player, playerIndex) => (
+          <div key={player.name} className={`grid grid-cols-[1.5fr_repeat(8,1fr)] items-center ${playerIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border-t border-gray-200`}>
+            <div className="flex flex-col px-2 py-2 border-r border-gray-300">
               <span className="font-semibold truncate text-sm">{player.name}</span>
               <span className="text-xs text-gray-500">({player.totalTournaments})</span>
             </div>
             {player.finishes.map((count, position) => (
-              <div key={position} className={`text-center ${getPositionBg(position)} rounded px-0.5 py-1`}>
+              <div key={position} className={`text-center px-1 py-2 border-r border-gray-300 ${position % 2 === 0 ? 'bg-blue-50' : 'bg-gray-50'} ${position === 7 ? 'border-r-0' : ''}`}>
                 <span className={`text-xs font-semibold ${getPositionColor(position)}`}>
                   {count || '-'}
                 </span>
