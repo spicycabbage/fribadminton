@@ -73,7 +73,16 @@ export async function GET(request: NextRequest) {
     let totalMarginWins = 0;
     let totalMarginLosses = 0;
 
-    partnershipMatches.forEach(match => {
+    partnershipMatches.forEach((match: {
+      tournament_id: string;
+      match_id: number;
+      round: number;
+      score_a: number;
+      score_b: number;
+      winner_team: string;
+      team_position: string;
+      date: string;
+    }) => {
       const isWin = match.winner_team === match.team_position;
       const partnerScore = match.team_position === 'A' ? match.score_a : match.score_b;
       const opponentScore = match.team_position === 'A' ? match.score_b : match.score_a;
@@ -105,7 +114,16 @@ export async function GET(request: NextRequest) {
         avgMarginVictory: parseFloat(avgMarginVictory),
         avgMarginDefeat: parseFloat(avgMarginDefeat)
       },
-      matches: partnershipMatches.map(match => ({
+      matches: partnershipMatches.map((match: {
+        tournament_id: string;
+        match_id: number;
+        round: number;
+        score_a: number;
+        score_b: number;
+        winner_team: string;
+        team_position: string;
+        date: string;
+      }) => ({
         tournamentId: match.tournament_id,
         date: match.date,
         round: match.round,
