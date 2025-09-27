@@ -61,11 +61,11 @@ export default function RankTab({ tournament, onFinalize }: RankTabProps) {
               }`}
             >
               <div className="flex items-center">
-                {getRankIcon(player.rank)}
+                {getRankIcon(player.rank || 1)}
                 <div className="ml-3">
                   <div className="flex items-center">
                     <span className="text-sm font-semibold text-gray-600 mr-2">
-                      {getRankDisplay(player.rank)}
+                      {getRankDisplay(player.rank || 1)}
                     </span>
                     <span className="font-semibold">
                       {player.name}
