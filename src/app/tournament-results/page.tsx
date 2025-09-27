@@ -253,6 +253,12 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
     totalTournaments: finishes.reduce((sum, count) => sum + count, 0),
     avgScoreDiff: playerScores[name].length > 0 
       ? Math.round(playerScores[name].reduce((sum, score) => sum + score, 0) / playerScores[name].length)
+      : 0,
+    careerBest: playerScores[name].length > 0 
+      ? Math.max(...playerScores[name])
+      : 0,
+    careerWorst: playerScores[name].length > 0 
+      ? Math.min(...playerScores[name])
       : 0
   })).sort((a, b) => b.totalTournaments - a.totalTournaments);
 
@@ -312,7 +318,9 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
                 <th className="w-12 px-2 py-2 text-center border-r border-gray-200">5th</th>
                 <th className="w-12 px-2 py-2 text-center border-r border-gray-200">6th</th>
                 <th className="w-12 px-2 py-2 text-center border-r border-gray-200">7th</th>
-                <th className="w-12 px-2 py-2 text-center">8th</th>
+                <th className="w-12 px-2 py-2 text-center border-r border-gray-200">8th</th>
+                <th className="w-16 px-2 py-2 text-center border-r border-gray-200 bg-green-100">PB</th>
+                <th className="w-16 px-2 py-2 text-center bg-red-100">PW</th>
               </tr>
             </thead>
             
@@ -332,12 +340,22 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
                     </span>
                   </td>
                   {player.finishes.map((count, position) => (
-                    <td key={position} className={`w-12 px-2 py-3 text-center border-r border-gray-200 ${position === 7 ? 'border-r-0' : ''} ${getPositionBg(position)}`}>
+                    <td key={position} className={`w-12 px-2 py-3 text-center border-r border-gray-200 ${getPositionBg(position)}`}>
                       <span className={`text-xs font-semibold ${getPositionColor(position)}`}>
                         {count || '-'}
                       </span>
                     </td>
                   ))}
+                  <td className="w-16 px-2 py-3 text-center border-r border-gray-200 bg-green-50">
+                    <span className="text-xs font-semibold text-green-700">
+                      {player.careerBest >= 0 ? '+' : ''}{player.careerBest}
+                    </span>
+                  </td>
+                  <td className="w-16 px-2 py-3 text-center bg-red-50">
+                    <span className="text-xs font-semibold text-red-700">
+                      {player.careerWorst >= 0 ? '+' : ''}{player.careerWorst}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
