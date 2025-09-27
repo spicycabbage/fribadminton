@@ -296,30 +296,30 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {/* Header */}
-        <div className="grid grid-cols-[2fr_repeat(8,1fr)] gap-1 px-3 py-2 bg-gray-100 rounded-lg text-xs font-semibold text-gray-600">
-          <div>Player</div>
-          <div className="text-center">1st</div>
-          <div className="text-center">2nd</div>
-          <div className="text-center">3rd</div>
-          <div className="text-center">4th</div>
-          <div className="text-center">5th</div>
-          <div className="text-center">6th</div>
-          <div className="text-center">7th</div>
-          <div className="text-center">8th</div>
+        <div className="grid grid-cols-[1.5fr_repeat(8,1fr)] gap-0.5 px-2 py-2 bg-gray-100 rounded-lg text-xs font-semibold text-gray-600">
+          <div className="text-xs">Player</div>
+          <div className="text-center text-xs">1st</div>
+          <div className="text-center text-xs">2nd</div>
+          <div className="text-center text-xs">3rd</div>
+          <div className="text-center text-xs">4th</div>
+          <div className="text-center text-xs">5th</div>
+          <div className="text-center text-xs">6th</div>
+          <div className="text-center text-xs">7th</div>
+          <div className="text-center text-xs">8th</div>
         </div>
 
         {/* Player Stats */}
         {playerStats.map((player) => (
-          <div key={player.name} className="grid grid-cols-[2fr_repeat(8,1fr)] gap-1 px-3 py-3 bg-gray-50 rounded-lg items-center">
-            <div className="flex items-center">
-              <span className="font-semibold truncate">{player.name}</span>
-              <span className="ml-2 text-xs text-gray-500">({player.totalTournaments})</span>
+          <div key={player.name} className="grid grid-cols-[1.5fr_repeat(8,1fr)] gap-0.5 px-2 py-2 bg-gray-50 rounded-lg items-center">
+            <div className="flex flex-col">
+              <span className="font-semibold truncate text-sm">{player.name}</span>
+              <span className="text-xs text-gray-500">({player.totalTournaments})</span>
             </div>
             {player.finishes.map((count, position) => (
-              <div key={position} className={`text-center ${getPositionBg(position)} rounded px-1 py-1`}>
-                <span className={`font-semibold ${getPositionColor(position)}`}>
+              <div key={position} className={`text-center ${getPositionBg(position)} rounded px-0.5 py-1`}>
+                <span className={`text-xs font-semibold ${getPositionColor(position)}`}>
                   {count || '-'}
                 </span>
               </div>
