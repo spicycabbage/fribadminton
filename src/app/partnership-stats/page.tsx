@@ -208,9 +208,9 @@ export default function PartnershipStatsPage() {
                   
                   <div className="bg-gray-50 p-4 rounded-lg text-center">
                     <div className="text-2xl font-bold text-purple-600">
-                      {partnershipData.stats.avgMarginVictory}
+                      {partnershipData.stats.avgMarginVictory > 0 ? `+${partnershipData.stats.avgMarginVictory}` : partnershipData.stats.avgMarginVictory}
                     </div>
-                    <div className="text-sm text-gray-600">Avg Margin of Victory</div>
+                    <div className="text-sm text-gray-600">Avg Margin</div>
                   </div>
                 </div>
               )}
