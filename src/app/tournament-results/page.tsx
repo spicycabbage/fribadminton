@@ -296,36 +296,52 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
         </p>
       </div>
 
-      <div className="border border-gray-300 rounded-lg overflow-hidden">
-        {/* Header */}
-        <div className="grid grid-cols-[1.5fr_repeat(8,1fr)] bg-gray-200 text-xs font-semibold text-gray-700">
-          <div className="px-2 py-2 border-r border-gray-300 bg-gray-200">Player</div>
-          <div className="text-center px-1 py-2 border-r border-gray-300 bg-blue-100">1st</div>
-          <div className="text-center px-1 py-2 border-r border-gray-300 bg-gray-100">2nd</div>
-          <div className="text-center px-1 py-2 border-r border-gray-300 bg-blue-100">3rd</div>
-          <div className="text-center px-1 py-2 border-r border-gray-300 bg-gray-100">4th</div>
-          <div className="text-center px-1 py-2 border-r border-gray-300 bg-blue-100">5th</div>
-          <div className="text-center px-1 py-2 border-r border-gray-300 bg-gray-100">6th</div>
-          <div className="text-center px-1 py-2 border-r border-gray-300 bg-blue-100">7th</div>
-          <div className="text-center px-1 py-2 bg-gray-100">8th</div>
-        </div>
-
-        {/* Player Stats */}
-        {playerStats.map((player, playerIndex) => (
-          <div key={player.name} className={`grid grid-cols-[1.5fr_repeat(8,1fr)] items-center ${playerIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border-t border-gray-200`}>
-            <div className="flex flex-col px-2 py-2 border-r border-gray-300">
-              <span className="font-semibold truncate text-sm">{player.name}</span>
-              <span className="text-xs text-gray-500">({player.totalTournaments})</span>
+      <div className="overflow-x-auto">
+        <div className="min-w-full">
+          {/* Header */}
+          <div className="flex bg-gray-100 rounded-t-lg text-xs font-semibold text-gray-600 sticky left-0">
+            <div className="flex-shrink-0 w-32 px-3 py-2 bg-gray-100 sticky left-0 z-10 border-r border-gray-200">
+              Player
             </div>
-            {player.finishes.map((count, position) => (
-              <div key={position} className={`text-center px-1 py-2 border-r border-gray-300 ${position % 2 === 0 ? 'bg-blue-50' : 'bg-gray-50'} ${position === 7 ? 'border-r-0' : ''}`}>
-                <span className={`text-xs font-semibold ${getPositionColor(position)}`}>
-                  {count || '-'}
-                </span>
-              </div>
-            ))}
+            <div className="flex">
+              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">1st</div>
+              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">2nd</div>
+              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">3rd</div>
+              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">4th</div>
+              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">5th</div>
+              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">6th</div>
+              <div className="w-12 px-2 py-2 text-center border-r border-gray-200">7th</div>
+              <div className="w-12 px-2 py-2 text-center">8th</div>
+            </div>
           </div>
-        ))}
+
+          {/* Player Stats */}
+          {playerStats.map((player) => (
+            <div key={player.name} className="flex bg-gray-50 border-t border-gray-200">
+              <div className="flex-shrink-0 w-32 px-3 py-3 bg-gray-50 sticky left-0 z-10 border-r border-gray-200">
+                <div className="flex flex-col">
+                  <span className="font-semibold truncate text-sm">{player.name}</span>
+                  <span className="text-xs text-gray-500">({player.totalTournaments})</span>
+                </div>
+              </div>
+              <div className="flex">
+                {player.finishes.map((count, position) => (
+                  <div key={position} className={`w-12 px-2 py-3 text-center border-r border-gray-200 ${position === 7 ? 'border-r-0' : ''} ${getPositionBg(position)}`}>
+                    <span className={`text-xs font-semibold ${getPositionColor(position)}`}>
+                      {count || '-'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Scroll hint */}
+        <div className="mt-2 text-center">
+          <p className="text-xs text-gray-500">← Scroll horizontally to see positions 4-8 →</p>
+        </div>
+      </div>
 
         {/* Summary */}
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">
