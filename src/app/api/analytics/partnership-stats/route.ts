@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
         FROM players 
         ORDER BY name ASC
       `;
-      return NextResponse.json({ players: players.map(p => p.name) });
+      return NextResponse.json({ players: players.map((p: { name: string }) => p.name) });
     }
 
     // Find all matches where these two players were partners
