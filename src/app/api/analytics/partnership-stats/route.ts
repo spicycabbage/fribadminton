@@ -85,9 +85,9 @@ export async function GET(request: NextRequest) {
       const isWin = match.winner_team === match.team_position;
       const partnerScore = match.team_position === 'A' ? match.score_a : match.score_b;
       const opponentScore = match.team_position === 'A' ? match.score_b : match.score_a;
-      const margin = Math.abs(partnerScore - opponentScore);
+      const margin = partnerScore - opponentScore; // Net margin (positive for wins, negative for losses)
 
-      console.log(`Match: Partner=${partnerScore}, Opponent=${opponentScore}, Margin=${margin}`);
+      console.log(`Match: Partner=${partnerScore}, Opponent=${opponentScore}, Net Margin=${margin}`);
       totalMargin += margin;
 
       if (isWin) {
