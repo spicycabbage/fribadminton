@@ -343,14 +343,13 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
         </div>
       </div>
 
-        {/* Summary */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h3 className="font-semibold text-blue-800 mb-2">Summary</h3>
-          <div className="text-sm text-blue-700">
-            <p>• Total Players: {playerStats.length}</p>
-            <p>• Total Tournaments: {tournaments.length}</p>
-            <p>• Most Active: {playerStats[0]?.name} ({playerStats[0]?.totalTournaments} tournaments)</p>
-          </div>
+      {/* Summary */}
+      <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+        <h3 className="font-semibold text-blue-800 mb-2">Summary</h3>
+        <div className="text-sm text-blue-700">
+          <p>• Total Players: {playerStats.length}</p>
+          <p>• Total Tournaments: {tournaments.length}</p>
+          <p>• Most Active: {playerStats[0]?.name} ({playerStats[0]?.totalTournaments} tournaments)</p>
         </div>
       </div>
     </div>
