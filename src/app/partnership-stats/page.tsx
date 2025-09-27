@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ChevronLeftIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
 interface PartnershipStats {
   totalGames: number;
@@ -91,19 +92,19 @@ export default function PartnershipStatsPage() {
   const availablePlayer2Options = players.filter(p => p !== player1);
 
   return (
-    <div className="mobile-container bg-blue-600 flex flex-col min-h-screen safe-area-inset-top safe-area-inset-bottom">
+    <div className="mobile-container bg-blue-600 min-h-screen safe-area-inset-top safe-area-inset-bottom">
       {/* Header */}
-      <div className="tournament-card w-[92%] mx-auto mt-4 mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <Link 
-            href="/" 
-            className="text-blue-600 hover:text-blue-800 font-medium"
-          >
-            ← Back to Home
-          </Link>
-          <h1 className="text-xl font-bold text-gray-800">Partnership Statistics</h1>
-          <div className="w-20"></div> {/* Spacer for centering */}
-        </div>
+      <div className="bg-white mx-[4%] mt-[4%] rounded-t-xl px-4 py-3 flex items-center">
+        <Link href="/" className="flex items-center text-gray-600 hover:text-gray-800">
+          <ChevronLeftIcon className="w-5 h-5 mr-1" />
+          <UserGroupIcon className="w-5 h-5 mr-2" />
+          <span className="font-semibold">Partnership Statistics</span>
+        </Link>
+      </div>
+
+      {/* Content */}
+      <div className="bg-white mx-[4%] mb-[4%] rounded-b-xl flex-1">
+        <div className="p-4">
 
         {/* Player Selection */}
         <div className="space-y-4">
@@ -162,12 +163,9 @@ export default function PartnershipStatsPage() {
               {error}
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Results */}
-      {partnershipData && (
-        <div className="tournament-card w-[92%] mx-auto mb-6">
+          {/* Results */}
+          {partnershipData && (
+            <div className="mt-6">
           {!partnershipData.exists ? (
             <div className="text-center py-8">
               <div className="text-gray-600 text-lg">
@@ -248,10 +246,12 @@ export default function PartnershipStatsPage() {
                   </div>
                 </div>
               )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
+        )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
