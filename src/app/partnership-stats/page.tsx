@@ -166,84 +166,86 @@ export default function PartnershipStatsPage() {
           {/* Results */}
           {partnershipData && (
             <div className="mt-6">
-          {!partnershipData.exists ? (
-            <div className="text-center py-8">
-              <div className="text-gray-600 text-lg">
-                {partnershipData.message || 'No such partnership'}
-              </div>
-              <div className="text-sm text-gray-500 mt-2">
-                {player1} and {player2} have never played together as partners.
-              </div>
-            </div>
-          ) : (
-            <div>
-              <h2 className="text-lg font-bold text-gray-800 mb-4 text-center">
-                {partnershipData.player1} & {partnershipData.player2}
-              </h2>
-              
-              {partnershipData.stats && (
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-green-600">
-                      {partnershipData.stats.wins}
-                    </div>
-                    <div className="text-sm text-gray-600">Wins</div>
+              {!partnershipData.exists ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-600 text-lg">
+                    {partnershipData.message || 'No such partnership'}
                   </div>
-                  
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-red-600">
-                      {partnershipData.stats.losses}
-                    </div>
-                    <div className="text-sm text-gray-600">Losses</div>
-                  </div>
-                  
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {partnershipData.stats.winPercentage}%
-                    </div>
-                    <div className="text-sm text-gray-600">Win Rate</div>
-                  </div>
-                  
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {partnershipData.stats.avgMarginVictory > 0 ? `+${partnershipData.stats.avgMarginVictory}` : partnershipData.stats.avgMarginVictory}
-                    </div>
-                    <div className="text-sm text-gray-600">Avg Margin</div>
+                  <div className="text-sm text-gray-500 mt-2">
+                    {player1} and {player2} have never played together as partners.
                   </div>
                 </div>
-              )}
-
-              {partnershipData.matches && partnershipData.matches.length > 0 && (
+              ) : (
                 <div>
-                  <h3 className="font-semibold text-gray-800 mb-3">Match History</h3>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {partnershipData.matches.map((match, index) => (
-                      <div
-                        key={index}
-                        className={`p-3 rounded-lg border ${
-                          match.won 
-                            ? 'bg-green-50 border-green-200' 
-                            : 'bg-red-50 border-red-200'
-                        }`}
-                      >
-                        <div className="flex justify-between items-center">
-                          <div className="text-sm">
-                            <div className="font-medium">
-                              Round {match.round} - {match.date}
-                            </div>
-                            <div className="text-gray-600">
-                              Score: {match.partnerScore} - {match.opponentScore}
-                            </div>
-                          </div>
-                          <div className={`text-sm font-bold ${
-                            match.won ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {match.won ? 'WIN' : 'LOSS'}
-                          </div>
+                  <h2 className="text-lg font-bold text-gray-800 mb-4 text-center">
+                    {partnershipData.player1} & {partnershipData.player2}
+                  </h2>
+                  
+                  {partnershipData.stats && (
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="bg-gray-50 p-4 rounded-lg text-center">
+                        <div className="text-2xl font-bold text-green-600">
+                          {partnershipData.stats.wins}
                         </div>
+                        <div className="text-sm text-gray-600">Wins</div>
                       </div>
-                    ))}
-                  </div>
+                      
+                      <div className="bg-gray-50 p-4 rounded-lg text-center">
+                        <div className="text-2xl font-bold text-red-600">
+                          {partnershipData.stats.losses}
+                        </div>
+                        <div className="text-sm text-gray-600">Losses</div>
+                      </div>
+                      
+                      <div className="bg-gray-50 p-4 rounded-lg text-center">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {partnershipData.stats.winPercentage}%
+                        </div>
+                        <div className="text-sm text-gray-600">Win Rate</div>
+                      </div>
+                      
+                      <div className="bg-gray-50 p-4 rounded-lg text-center">
+                        <div className="text-2xl font-bold text-purple-600">
+                          {partnershipData.stats.avgMarginVictory > 0 ? `+${partnershipData.stats.avgMarginVictory}` : partnershipData.stats.avgMarginVictory}
+                        </div>
+                        <div className="text-sm text-gray-600">Avg Margin</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {partnershipData.matches && partnershipData.matches.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-gray-800 mb-3">Match History</h3>
+                      <div className="space-y-2 max-h-64 overflow-y-auto">
+                        {partnershipData.matches.map((match, index) => (
+                          <div
+                            key={index}
+                            className={`p-3 rounded-lg border ${
+                              match.won 
+                                ? 'bg-green-50 border-green-200' 
+                                : 'bg-red-50 border-red-200'
+                            }`}
+                          >
+                            <div className="flex justify-between items-center">
+                              <div className="text-sm">
+                                <div className="font-medium">
+                                  Round {match.round} - {match.date}
+                                </div>
+                                <div className="text-gray-600">
+                                  Score: {match.partnerScore} - {match.opponentScore}
+                                </div>
+                              </div>
+                              <div className={`text-sm font-bold ${
+                                match.won ? 'text-green-600' : 'text-red-600'
+                              }`}>
+                                {match.won ? 'WIN' : 'LOSS'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
