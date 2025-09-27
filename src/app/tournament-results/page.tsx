@@ -197,20 +197,20 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
 
       {/* Expanded Details */}
       {expanded && (
-        <div className="p-4 border-t">
-          <h4 className="font-semibold mb-3">Final Standings</h4>
+        <div className="p-4 border-t bg-black text-white">
+          <h4 className="font-semibold mb-3 text-white">Final Standings</h4>
           <div className="space-y-2">
             {rankedPlayers.map((player) => (
               <div key={player.id} className="flex items-center justify-between py-2">
                 <div className="flex items-center">
-                  <span className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                  <span className="w-8 h-8 bg-gray-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
                     {player.rank}
                   </span>
-                  <span className={player.rank === 1 ? 'font-semibold text-yellow-600' : ''}>
+                  <span className={player.rank === 1 ? 'font-semibold text-yellow-400' : 'text-white'}>
                     {player.name}
                   </span>
                 </div>
-                <span className="font-semibold">
+                <span className="font-semibold text-white">
                   {player.totalScore - 147}
                 </span>
               </div>
@@ -218,8 +218,8 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
           </div>
 
           {tournament.isFinalized && (
-            <div className="mt-4 p-3 bg-green-100 rounded-lg">
-              <p className="text-green-800 text-sm font-medium">
+            <div className="mt-4 p-3 bg-green-800 rounded-lg">
+              <p className="text-green-200 text-sm font-medium">
                 ✓ Tournament Finalized
               </p>
             </div>
