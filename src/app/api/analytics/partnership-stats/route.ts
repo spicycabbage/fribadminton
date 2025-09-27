@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
       const opponentScore = match.team_position === 'A' ? match.score_b : match.score_a;
       const margin = Math.abs(partnerScore - opponentScore);
 
+      console.log(`Match: Partner=${partnerScore}, Opponent=${opponentScore}, Margin=${margin}`);
       totalMargin += margin;
 
       if (isWin) {
@@ -99,6 +100,8 @@ export async function GET(request: NextRequest) {
     const totalGames = wins + losses;
     const winPercentage = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : '0.0';
     const avgMarginVictory = totalGames > 0 ? (totalMargin / totalGames).toFixed(1) : '0.0';
+    
+    console.log(`Total games: ${totalGames}, Total margin: ${totalMargin}, Avg: ${avgMarginVictory}`);
 
     return NextResponse.json({
       exists: true,
