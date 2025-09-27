@@ -20,12 +20,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Player name is required' }, { status: 400 });
     }
     
-    // Check cache first
+    // Clear cache for this fix and check cache
     const cacheKey = CACHE_KEYS.HEAD_TO_HEAD(playerName);
-    const cachedRecords = analyticsCache.get<HeadToHeadRecord[]>(cacheKey);
-    if (cachedRecords) {
-      return NextResponse.json(cachedRecords);
-    }
+    // Temporarily disable cache to ensure fresh data after bug fix
+    // const cachedRecords = analyticsCache.get<HeadToHeadRecord[]>(cacheKey);
+    // if (cachedRecords) {
+    //   return NextResponse.json(cachedRecords);
+    // }
     
     // Single optimized query to get all head-to-head records
     const headToHeadRecords = await sql<{
@@ -38,11 +39,16 @@ export async function POST(req: Request) {
     }[]>`
       WITH opponent_matches AS (
         SELECT 
+          -- Get opponent names: if player is on team A, opponents are on team B and vice versa
           CASE 
-            WHEN p1.name = ${playerName} THEN p2.name
-            WHEN p2.name = ${playerName} THEN p1.name
-            WHEN p3.name = ${playerName} THEN p4.name
-            WHEN p4.name = ${playerName} THEN p3.name
+            WHEN p1.name = ${playerName} THEN 
+              CASE WHEN p3.name != ${playerName} THEN p3.name ELSE p4.name END
+            WHEN p2.name = ${playerName} THEN 
+              CASE WHEN p3.name != ${playerName} THEN p3.name ELSE p4.name END
+            WHEN p3.name = ${playerName} THEN 
+              CASE WHEN p1.name != ${playerName} THEN p1.name ELSE p2.name END
+            WHEN p4.name = ${playerName} THEN 
+              CASE WHEN p1.name != ${playerName} THEN p1.name ELSE p2.name END
           END as opponent_name,
           CASE 
             -- Player is on team A and team A wins
@@ -70,12 +76,18 @@ export async function POST(req: Request) {
           AND m.score_a IS NOT NULL
           AND m.score_b IS NOT NULL
           AND (
-            -- Player is on team A, opponent on team B
-            (p1.name = ${playerName} AND (p3.name != ${playerName} AND p4.name != ${playerName})) OR
-            (p2.name = ${playerName} AND (p3.name != ${playerName} AND p4.name != ${playerName})) OR
-            -- Player is on team B, opponent on team A  
-            (p3.name = ${playerName} AND (p1.name != ${playerName} AND p2.name != ${playerName})) OR
-            (p4.name = ${playerName} AND (p1.name != ${playerName} AND p2.name != ${playerName}))
+            -- Player must be in the match (on either team)
+            p1.name = ${playerName} OR p2.name = ${playerName} OR 
+            p3.name = ${playerName} OR p4.name = ${playerName}
+          )
+          -- Ensure it's actually a head-to-head match (player vs opponent, not as partners)
+          AND (
+            -- Player on team A, opponent on team B
+            ((p1.name = ${playerName} OR p2.name = ${playerName}) AND 
+             (p3.name != ${playerName} AND p4.name != ${playerName})) OR
+            -- Player on team B, opponent on team A
+            ((p3.name = ${playerName} OR p4.name = ${playerName}) AND 
+             (p1.name != ${playerName} AND p2.name != ${playerName}))
           )
       )
       SELECT 
@@ -92,7 +104,7 @@ export async function POST(req: Request) {
           ELSE 0
         END as avg_margin
       FROM opponent_matches
-      WHERE opponent_name IS NOT NULL
+      WHERE opponent_name IS NOT NULL AND opponent_name != ${playerName}
       GROUP BY opponent_name
       ORDER BY win_percentage DESC, total_matches DESC
     `;
