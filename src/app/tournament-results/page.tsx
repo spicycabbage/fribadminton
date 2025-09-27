@@ -171,24 +171,24 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
     <div className="border border-gray-200 rounded-lg overflow-hidden">
       {/* Tournament Header */}
       <div 
-        className="p-4 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+        className="p-4 bg-black cursor-pointer hover:bg-gray-800 transition-colors"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <CalendarIcon className="w-5 h-5 text-gray-500 mr-2" />
+            <CalendarIcon className="w-5 h-5 text-gray-300 mr-2" />
             <div>
-              <p className="font-semibold text-gray-800">
+              <p className="font-semibold text-white">
                 {formatDate(tournament.date)}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <div className="flex items-center text-yellow-600">
+            <div className="flex items-center text-yellow-400">
               <TrophyIcon className="w-5 h-5 mr-1" />
               <span className="font-semibold">{winner.name}</span>
             </div>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-300">
               {winner.totalScore - 147} from max
             </p>
           </div>
@@ -197,33 +197,25 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
 
       {/* Expanded Details */}
       {expanded && (
-        <div className="p-4 border-t bg-black text-white">
-          <h4 className="font-semibold mb-3 text-white">Final Standings</h4>
+        <div className="p-4 border-t bg-white">
+          <h4 className="font-semibold mb-3 text-gray-800">Final Standings</h4>
           <div className="space-y-2">
             {rankedPlayers.map((player) => (
               <div key={player.id} className="flex items-center justify-between py-2">
                 <div className="flex items-center">
-                  <span className="w-8 h-8 bg-gray-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                  <span className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-semibold mr-3">
                     {player.rank}
                   </span>
-                  <span className={player.rank === 1 ? 'font-semibold text-yellow-400' : 'text-white'}>
+                  <span className={player.rank === 1 ? 'font-semibold text-yellow-600' : 'text-gray-800'}>
                     {player.name}
                   </span>
                 </div>
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-gray-800">
                   {player.totalScore - 147}
                 </span>
               </div>
             ))}
           </div>
-
-          {tournament.isFinalized && (
-            <div className="mt-4 p-3 bg-green-800 rounded-lg">
-              <p className="text-green-200 text-sm font-medium">
-                ✓ Tournament Finalized
-              </p>
-            </div>
-          )}
         </div>
       )}
     </div>
