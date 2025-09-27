@@ -70,8 +70,7 @@ export async function GET(request: NextRequest) {
     // Calculate statistics
     let wins = 0;
     let losses = 0;
-    let totalMarginWins = 0;
-    let totalMarginLosses = 0;
+    let totalMargin = 0;
 
     partnershipMatches.forEach((match: {
       tournament_id: string;
@@ -88,19 +87,18 @@ export async function GET(request: NextRequest) {
       const opponentScore = match.team_position === 'A' ? match.score_b : match.score_a;
       const margin = Math.abs(partnerScore - opponentScore);
 
+      totalMargin += margin;
+
       if (isWin) {
         wins++;
-        totalMarginWins += margin;
       } else {
         losses++;
-        totalMarginLosses += margin;
       }
     });
 
     const totalGames = wins + losses;
     const winPercentage = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : '0.0';
-    const avgMarginVictory = wins > 0 ? (totalMarginWins / wins).toFixed(1) : '0.0';
-    const avgMarginDefeat = losses > 0 ? (totalMarginLosses / losses).toFixed(1) : '0.0';
+    const avgMarginVictory = totalGames > 0 ? (totalMargin / totalGames).toFixed(1) : '0.0';
 
     return NextResponse.json({
       exists: true,
@@ -111,8 +109,7 @@ export async function GET(request: NextRequest) {
         wins,
         losses,
         winPercentage: parseFloat(winPercentage),
-        avgMarginVictory: parseFloat(avgMarginVictory),
-        avgMarginDefeat: parseFloat(avgMarginDefeat)
+        avgMarginVictory: parseFloat(avgMarginVictory)
       },
       matches: partnershipMatches.map((match: {
         tournament_id: string;
