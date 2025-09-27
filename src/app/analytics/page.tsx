@@ -165,7 +165,6 @@ export default function AnalyticsPage() {
                 <div className="text-sm text-blue-700">
                   <p>• Total Players: {playerStats.length}</p>
                   <p>• Total Matches: {playerStats.reduce((sum, p) => sum + p.totalMatches, 0)}</p>
-                  <p>• Average Win Rate: {playerStats.length > 0 ? Math.round(playerStats.reduce((sum, p) => sum + p.winPercentage, 0) / playerStats.length) : 0}%</p>
                 </div>
               </div>
             </div>
