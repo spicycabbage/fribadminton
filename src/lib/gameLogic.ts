@@ -108,10 +108,10 @@ export function createTournament(accessCode: string, playerNames: string[], date
   return {
     id: generateTournamentId(),
     accessCode,
-    // Use provided date or default to today in Pacific Time
+    // Use provided date or default to today in PST
     date: date || (() => {
       const now = new Date();
-      // en-CA yields YYYY-MM-DD; force Pacific Time
+      // en-CA yields YYYY-MM-DD; force PST
       const fmt = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/Los_Angeles',
         year: 'numeric',

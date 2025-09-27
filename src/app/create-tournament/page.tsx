@@ -16,8 +16,13 @@ export default function CreateTournamentPage() {
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
-    // Set default date to today
-    const today = new Date().toISOString().split('T')[0];
+    // Set default date to today in Pacific Time
+    const today = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Los_Angeles',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(new Date());
     setTournamentDate(today);
   }, []);
 
