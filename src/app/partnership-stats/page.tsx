@@ -246,10 +246,8 @@ export default function PartnershipStatsPage() {
                   </div>
                 </div>
               )}
-              </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
         </div>
       </div>
     </div>
