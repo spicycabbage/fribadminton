@@ -210,7 +210,7 @@ export default function PartnershipStatsPage() {
                     <div className="text-2xl font-bold text-purple-600">
                       {partnershipData.stats.avgMarginVictory}
                     </div>
-                    <div className="text-sm text-gray-600">Avg Margin (Wins)</div>
+                    <div className="text-sm text-gray-600">Avg Margin of Victory</div>
                   </div>
                 </div>
               )}

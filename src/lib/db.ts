@@ -53,6 +53,17 @@ export function ensureSchema(): Promise<void> {
     } catch (e) {
       // Column might already exist, ignore error
     }
+
+    // Add performance indexes (safe - no data changes)
+    try {
+      await sql`create index if not exists idx_players_tournament_name on players(tournament_id, name)`;
+      await sql`create index if not exists idx_matches_tournament_completed on matches(tournament_id, completed)`;
+      await sql`create index if not exists idx_matches_players on matches(tournament_id, team_a_p1, team_a_p2, team_b_p1, team_b_p2)`;
+      await sql`create index if not exists idx_tournaments_finalized on tournaments(is_finalized)`;
+      await sql`create index if not exists idx_matches_winner on matches(tournament_id, winner_team, completed)`;
+    } catch (e) {
+      // Indexes might already exist, ignore error
+    }
   })();
   return schemaReady;
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ensureSchema, sql } from '@/lib/db';
+import { analyticsCache, CACHE_KEYS, CACHE_TTL } from '@/lib/cache';
 
 interface PlayerStats {
   name: string;
@@ -13,87 +14,69 @@ export async function GET() {
   try {
     await ensureSchema();
     
-    // Get all finalized tournaments
-    const tournaments = await sql<{ id: string }[]>`
-      SELECT id FROM tournaments 
-      WHERE is_finalized = true
+    // Check cache first
+    const cachedStats = analyticsCache.get<PlayerStats[]>(CACHE_KEYS.PLAYER_STATS);
+    if (cachedStats) {
+      return NextResponse.json(cachedStats);
+    }
+    
+    // Single optimized query to get all player stats at once
+    const playerStats = await sql<{
+      name: string;
+      wins: number;
+      losses: number;
+      total_matches: number;
+      win_percentage: number;
+    }[]>`
+      WITH player_matches AS (
+        SELECT 
+          p.name,
+          CASE 
+            WHEN (m.team_a_p1 = p.id OR m.team_a_p2 = p.id) AND m.winner_team = 'A' THEN 1
+            WHEN (m.team_b_p1 = p.id OR m.team_b_p2 = p.id) AND m.winner_team = 'B' THEN 1
+            ELSE 0
+          END as is_win
+        FROM players p
+        JOIN tournaments t ON p.tournament_id = t.id
+        JOIN matches m ON p.tournament_id = m.tournament_id
+        WHERE t.is_finalized = true 
+          AND m.completed = true 
+          AND m.winner_team IS NOT NULL
+          AND (m.team_a_p1 = p.id OR m.team_a_p2 = p.id OR m.team_b_p1 = p.id OR m.team_b_p2 = p.id)
+      )
+      SELECT 
+        name,
+        SUM(is_win)::integer as wins,
+        (COUNT(*) - SUM(is_win))::integer as losses,
+        COUNT(*)::integer as total_matches,
+        CASE 
+          WHEN COUNT(*) > 0 THEN ROUND((SUM(is_win)::float / COUNT(*)) * 100)::integer
+          ELSE 0
+        END as win_percentage
+      FROM player_matches
+      GROUP BY name
+      ORDER BY win_percentage DESC, total_matches DESC
     `;
 
-    if (tournaments.length === 0) {
-      return NextResponse.json([]);
-    }
+    // Convert to the expected format
+    const formattedStats: PlayerStats[] = playerStats.map((stat: {
+      name: string;
+      wins: number;
+      losses: number;
+      total_matches: number;
+      win_percentage: number;
+    }) => ({
+      name: stat.name,
+      wins: stat.wins,
+      losses: stat.losses,
+      totalMatches: stat.total_matches,
+      winPercentage: stat.win_percentage
+    }));
 
-    // Get all players from finalized tournaments
-    const tournamentIds = tournaments.map((t: { id: string }) => t.id);
-    const players = await sql<{ name: string }[]>`
-      SELECT DISTINCT name FROM players 
-      WHERE tournament_id = ANY(${tournamentIds})
-      ORDER BY name
-    `;
+    // Cache the results
+    analyticsCache.set(CACHE_KEYS.PLAYER_STATS, formattedStats, CACHE_TTL);
 
-    const playerStats: PlayerStats[] = [];
-
-    for (const player of players) {
-      let wins = 0;
-      let losses = 0;
-
-      // For each tournament, get matches where this player participated
-      for (const tournament of tournaments) {
-        // Get player ID in this tournament
-        const playerInTournament = await sql<{ id: number }[]>`
-          SELECT id FROM players 
-          WHERE tournament_id = ${tournament.id} AND name = ${player.name}
-          LIMIT 1
-        `;
-
-        if (playerInTournament.length === 0) continue;
-        const playerId = playerInTournament[0].id;
-
-        // Get all completed matches where this player participated
-        const matches = await sql<{ winner_team: string | null; team_a_p1: number; team_a_p2: number; team_b_p1: number; team_b_p2: number }[]>`
-          SELECT winner_team, team_a_p1, team_a_p2, team_b_p1, team_b_p2
-          FROM matches 
-          WHERE tournament_id = ${tournament.id} 
-            AND completed = true 
-            AND winner_team IS NOT NULL
-            AND (team_a_p1 = ${playerId} OR team_a_p2 = ${playerId} OR team_b_p1 = ${playerId} OR team_b_p2 = ${playerId})
-        `;
-
-        for (const match of matches) {
-          const isTeamA = match.team_a_p1 === playerId || match.team_a_p2 === playerId;
-          const isTeamB = match.team_b_p1 === playerId || match.team_b_p2 === playerId;
-          
-          if (match.winner_team === 'A' && isTeamA) {
-            wins++;
-          } else if (match.winner_team === 'B' && isTeamB) {
-            wins++;
-          } else if ((match.winner_team === 'A' && isTeamB) || (match.winner_team === 'B' && isTeamA)) {
-            losses++;
-          }
-        }
-      }
-
-      const totalMatches = wins + losses;
-      const winPercentage = totalMatches > 0 ? Math.round((wins / totalMatches) * 100) : 0;
-
-      playerStats.push({
-        name: player.name,
-        wins,
-        losses,
-        totalMatches,
-        winPercentage
-      });
-    }
-
-    // Sort by win percentage (descending), then by total matches (descending)
-    playerStats.sort((a, b) => {
-      if (b.winPercentage !== a.winPercentage) {
-        return b.winPercentage - a.winPercentage;
-      }
-      return b.totalMatches - a.totalMatches;
-    });
-
-    return NextResponse.json(playerStats);
+    return NextResponse.json(formattedStats);
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Server error' }, { status: 500 });
   }

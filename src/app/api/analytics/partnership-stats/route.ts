@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ensureSchema, sql } from '@/lib/db';
+import { analyticsCache, CACHE_KEYS, CACHE_TTL } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,12 +12,30 @@ export async function GET(request: NextRequest) {
 
     // If no players specified, return all unique players
     if (!player1Name || !player2Name) {
+      // Check cache for all players
+      const cachedPlayers = analyticsCache.get<string[]>(CACHE_KEYS.ALL_PLAYERS);
+      if (cachedPlayers) {
+        return NextResponse.json({ players: cachedPlayers });
+      }
+
       const players = await sql<{ name: string }[]>`
         SELECT DISTINCT name 
         FROM players 
         ORDER BY name ASC
       `;
-      return NextResponse.json({ players: players.map((p: { name: string }) => p.name) });
+      const playerNames = players.map((p: { name: string }) => p.name);
+      
+      // Cache the player list
+      analyticsCache.set(CACHE_KEYS.ALL_PLAYERS, playerNames, CACHE_TTL);
+      
+      return NextResponse.json({ players: playerNames });
+    }
+
+    // Check cache for partnership stats
+    const cacheKey = CACHE_KEYS.PARTNERSHIP_STATS(player1Name, player2Name);
+    const cachedStats = analyticsCache.get(cacheKey);
+    if (cachedStats) {
+      return NextResponse.json(cachedStats);
     }
 
     // Find all matches where these two players were partners
@@ -61,10 +80,15 @@ export async function GET(request: NextRequest) {
     `;
 
     if (partnershipMatches.length === 0) {
-      return NextResponse.json({ 
+      const noPartnershipResult = { 
         exists: false, 
         message: "No such partnership" 
-      });
+      };
+      
+      // Cache the "no partnership" result too
+      analyticsCache.set(cacheKey, noPartnershipResult, CACHE_TTL);
+      
+      return NextResponse.json(noPartnershipResult);
     }
 
     // Calculate statistics
@@ -87,7 +111,6 @@ export async function GET(request: NextRequest) {
       const opponentScore = match.team_position === 'A' ? match.score_b : match.score_a;
       const margin = partnerScore - opponentScore; // Net margin (positive for wins, negative for losses)
 
-      console.log(`Match: Partner=${partnerScore}, Opponent=${opponentScore}, Net Margin=${margin}`);
       totalMargin += margin;
 
       if (isWin) {
@@ -100,10 +123,8 @@ export async function GET(request: NextRequest) {
     const totalGames = wins + losses;
     const winPercentage = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : '0.0';
     const avgMarginVictory = totalGames > 0 ? (totalMargin / totalGames).toFixed(1) : '0.0';
-    
-    console.log(`Total games: ${totalGames}, Total margin: ${totalMargin}, Avg: ${avgMarginVictory}`);
 
-    return NextResponse.json({
+    const result = {
       exists: true,
       player1: player1Name,
       player2: player2Name,
@@ -131,7 +152,12 @@ export async function GET(request: NextRequest) {
         opponentScore: match.team_position === 'A' ? match.score_b : match.score_a,
         won: match.winner_team === match.team_position
       }))
-    });
+    };
+
+    // Cache the result
+    analyticsCache.set(cacheKey, result, CACHE_TTL);
+
+    return NextResponse.json(result);
 
   } catch (error) {
     console.error('Partnership stats error:', error);
