@@ -160,20 +160,19 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
     <div className={containerClass}>
       {/* Team A */}
       <div className="team-a mb-3 p-4 rounded-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex-1 mr-4 min-w-0">
-            <div className="text-xs font-medium text-blue-800 mb-1">Team A</div>
-            <div className="flex items-center space-x-1">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-2 flex-1 min-w-0">
+            <div className="text-lg font-bold text-blue-800 mt-1">A</div>
+            <div className="flex flex-col space-y-1 flex-1 min-w-0">
               <span className="player-button">
                 {getPlayerName(match.teamA.player1)}
               </span>
-              <span className="text-gray-500 text-sm">-</span>
               <span className="player-button">
                 {getPlayerName(match.teamA.player2)}
               </span>
             </div>
           </div>
-          <div className="text-3xl font-bold text-right w-[80px] flex-shrink-0">
+          <div className="text-3xl font-bold text-right w-[80px] flex-shrink-0 ml-4">
             {isLocked || (isCompleted && !isEditing) ? (match.scoreA ?? '-') : (
               <input
                 type="number"
@@ -194,20 +193,19 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
 
       {/* Team B */}
       <div className="team-b mb-4 p-4 rounded-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex-1 mr-4 min-w-0">
-            <div className="text-xs font-medium text-red-800 mb-1">Team B</div>
-            <div className="flex items-center space-x-1">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-2 flex-1 min-w-0">
+            <div className="text-lg font-bold text-red-800 mt-1">B</div>
+            <div className="flex flex-col space-y-1 flex-1 min-w-0">
               <span className="player-button bg-red-600">
                 {getPlayerName(match.teamB.player1)}
               </span>
-              <span className="text-gray-500 text-sm">-</span>
               <span className="player-button bg-red-600">
                 {getPlayerName(match.teamB.player2)}
               </span>
             </div>
           </div>
-          <div className="text-3xl font-bold text-right w-[80px] flex-shrink-0">
+          <div className="text-3xl font-bold text-right w-[80px] flex-shrink-0 ml-4">
             {isLocked || (isCompleted && !isEditing) ? (match.scoreB ?? '-') : (
               <input
                 type="number"
