@@ -161,8 +161,8 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
       {/* Team A */}
       <div className="team-a mb-3 p-4 rounded-lg">
         <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-2 flex-1 min-w-0">
-            <div className="text-lg font-bold text-blue-800 mt-1">A</div>
+          <div className="flex items-center space-x-2 flex-1 min-w-0">
+            <div className="text-lg font-bold text-blue-800">A</div>
             <div className="flex flex-col space-y-1 flex-1 min-w-0">
               <span className="player-button">
                 {getPlayerName(match.teamA.player1)}
@@ -194,8 +194,8 @@ function MatchCard({ match, tournament, onScoreUpdate }: MatchCardProps) {
       {/* Team B */}
       <div className="team-b mb-4 p-4 rounded-lg">
         <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-2 flex-1 min-w-0">
-            <div className="text-lg font-bold text-red-800 mt-1">B</div>
+          <div className="flex items-center space-x-2 flex-1 min-w-0">
+            <div className="text-lg font-bold text-red-800">B</div>
             <div className="flex flex-col space-y-1 flex-1 min-w-0">
               <span className="player-button bg-red-600">
                 {getPlayerName(match.teamB.player1)}
