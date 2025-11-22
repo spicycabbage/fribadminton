@@ -73,10 +73,17 @@ export const DEFAULT_PLAYER_NAMES = [
   'Ian', 'Trevor', 'Jim', 'Peter', 'Ben', 'Andrew', 'Dan', 'Yves', 'Brian', 'Stan'
 ];
 
+/**
+ * Normalizes a player name by trimming whitespace
+ */
+export function normalizeName(name: string): string {
+  return name.trim();
+}
+
 export function createTournament(accessCode: string, playerNames: string[], date?: string): Tournament {
   const players: Player[] = playerNames.map((name, index) => ({
     id: index + 1,
-    name,
+    name: normalizeName(name),
     scores: new Array(7).fill(0),
     totalScore: 0
   }));
