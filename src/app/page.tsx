@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 export default function HomePage() {
   const [hasActive, setHasActive] = useState<boolean>(false);
   const [checking, setChecking] = useState<boolean>(true);
+  const [selectedYear, setSelectedYear] = useState<string>('');
+  const [availableYears, setAvailableYears] = useState<string[]>([]);
 
   useEffect(() => {
     let ignore = false;
@@ -21,6 +23,41 @@ export default function HomePage() {
     })();
     return () => { ignore = true; };
   }, []);
+
+  // Fetch available years from tournaments
+  useEffect(() => {
+    const fetchYears = async () => {
+      try {
+        const response = await fetch('/api/tournaments/history', { cache: 'no-store' });
+        if (response.ok) {
+          const tournaments = await response.json();
+          const years = new Set<string>();
+          tournaments.forEach((t: any) => {
+            const year = new Date(t.date).getFullYear().toString();
+            years.add(year);
+          });
+          const sortedYears = Array.from(years).sort((a, b) => parseInt(b) - parseInt(a));
+          setAvailableYears(sortedYears);
+          
+          // Set default to current year
+          const currentYear = new Date().getFullYear().toString();
+          const savedYear = localStorage.getItem('selectedYear');
+          setSelectedYear(savedYear || currentYear);
+        }
+      } catch (err) {
+        console.error('Failed to fetch years:', err);
+        // Default to current year
+        const currentYear = new Date().getFullYear().toString();
+        setSelectedYear(currentYear);
+      }
+    };
+    fetchYears();
+  }, []);
+
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    localStorage.setItem('selectedYear', year);
+  };
 
   return (
     <div className="mobile-container bg-blue-600 flex flex-col justify-center items-center min-h-screen safe-area-inset-top safe-area-inset-bottom">
@@ -64,11 +101,28 @@ export default function HomePage() {
 
       {/* Tournament History Section */}
       <div className="tournament-card w-[92%]">
-        {/* Removed section title per request */}
+        {/* Year Filter */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Filter by Year
+          </label>
+          <select
+            value={selectedYear}
+            onChange={(e) => handleYearChange(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-semibold"
+          >
+            <option value="all">All Years</option>
+            {availableYears.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className="space-y-3">
           <Link 
-            href="/tournament-results" 
+            href={`/tournament-results?year=${selectedYear}`}
             className="block w-full"
           >
             <button className="w-full bg-blue-500 text-white py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 transition-colors">
@@ -77,7 +131,7 @@ export default function HomePage() {
           </Link>
 
           <Link 
-            href="/analytics" 
+            href={`/analytics?year=${selectedYear}`}
             className="block w-full"
           >
             <button className="w-full bg-purple-500 text-white py-4 rounded-lg font-semibold text-lg hover:bg-purple-600 transition-colors">
@@ -86,7 +140,7 @@ export default function HomePage() {
           </Link>
 
           <Link 
-            href="/partnership-stats" 
+            href={`/partnership-stats?year=${selectedYear}`}
             className="block w-full"
           >
             <button className="w-full bg-orange-500 text-white py-4 rounded-lg font-semibold text-lg hover:bg-orange-600 transition-colors">

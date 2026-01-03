@@ -2,13 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ChevronLeftIcon, TrophyIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { Tournament, getRankedPlayers } from '@/lib/gameLogic';
 
 export default function TournamentResultsPage() {
+  const searchParams = useSearchParams();
+  const yearParam = searchParams.get('year');
+  
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [filteredTournaments, setFilteredTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'history' | 'finishes'>('history');
+  const [selectedYear, setSelectedYear] = useState<string>(yearParam || new Date().getFullYear().toString());
 
   useEffect(() => {
     const loadTournaments = async () => {
@@ -52,6 +58,19 @@ export default function TournamentResultsPage() {
 
     loadTournaments();
   }, []);
+
+  // Filter tournaments by selected year
+  useEffect(() => {
+    if (selectedYear === 'all') {
+      setFilteredTournaments(tournaments);
+    } else {
+      const filtered = tournaments.filter((t) => {
+        const year = new Date(t.date).getFullYear().toString();
+        return year === selectedYear;
+      });
+      setFilteredTournaments(filtered);
+    }
+  }, [tournaments, selectedYear]);
 
   const formatDate = (dateString: string) => {
     // Interpret stored YYYY-MM-DD in Pacific Time without day shift
@@ -132,22 +151,32 @@ export default function TournamentResultsPage() {
                   <div className="mb-6 text-center">
                     <h2 className="text-xl font-bold text-gray-800">Tournament History</h2>
                     <p className="text-gray-600 text-sm">
-                      {tournaments.length} completed tournament{tournaments.length !== 1 ? 's' : ''}
+                      {filteredTournaments.length} tournament{filteredTournaments.length !== 1 ? 's' : ''} in {selectedYear === 'all' ? 'all years' : selectedYear}
                     </p>
                   </div>
 
-                  <div className="space-y-4">
-                    {tournaments.map((tournament) => (
-                      <TournamentResultCard 
-                        key={tournament.id} 
-                        tournament={tournament}
-                        formatDate={formatDate}
-                      />
-                    ))}
-                  </div>
+                  {filteredTournaments.length === 0 ? (
+                    <div className="text-center py-8">
+                      <TrophyIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                      <h3 className="text-lg font-bold text-gray-600 mb-2">No tournaments found</h3>
+                      <p className="text-gray-500">
+                        No tournaments for {selectedYear}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {filteredTournaments.map((tournament) => (
+                        <TournamentResultCard 
+                          key={tournament.id} 
+                          tournament={tournament}
+                          formatDate={formatDate}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
-                <HistoricalFinishesTab tournaments={tournaments} />
+                <HistoricalFinishesTab tournaments={filteredTournaments} selectedYear={selectedYear} />
               )}
             </div>
           </div>
@@ -224,9 +253,10 @@ function TournamentResultCard({ tournament, formatDate }: TournamentResultCardPr
 
 interface HistoricalFinishesTabProps {
   tournaments: Tournament[];
+  selectedYear: string;
 }
 
-function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
+function HistoricalFinishesTab({ tournaments, selectedYear }: HistoricalFinishesTabProps) {
   // Calculate historical finishes and average scores for each player
   const playerFinishes: Record<string, number[]> = {};
   const playerScores: Record<string, number[]> = {};
@@ -297,7 +327,7 @@ function HistoricalFinishesTab({ tournaments }: HistoricalFinishesTabProps) {
       <div className="mb-6 text-center">
         <h2 className="text-xl font-bold text-gray-800">Historical Finishes</h2>
         <p className="text-gray-600 text-sm">
-          How many times each player finished in each position
+          Player finishes for {selectedYear === 'all' ? 'all years' : selectedYear}
         </p>
       </div>
 

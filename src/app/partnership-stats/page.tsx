@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ChevronLeftIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
 interface PartnershipStats {
@@ -31,12 +32,16 @@ interface PartnershipData {
 }
 
 export default function PartnershipStatsPage() {
+  const searchParams = useSearchParams();
+  const yearParam = searchParams.get('year');
+  
   const [players, setPlayers] = useState<string[]>([]);
   const [player1, setPlayer1] = useState<string>('');
   const [player2, setPlayer2] = useState<string>('');
   const [partnershipData, setPartnershipData] = useState<PartnershipData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [selectedYear] = useState<string>(yearParam || new Date().getFullYear().toString());
 
   // Fetch all players on component mount
   useEffect(() => {
@@ -72,7 +77,7 @@ export default function PartnershipStatsPage() {
 
     try {
       const response = await fetch(
-        `/api/analytics/partnership-stats?player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}`
+        `/api/analytics/partnership-stats?player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}&year=${selectedYear}`
       );
       
       if (response.ok) {
@@ -177,9 +182,12 @@ export default function PartnershipStatsPage() {
                 </div>
               ) : (
                 <div>
-                  <h2 className="text-lg font-bold text-gray-800 mb-4 text-center">
+                  <h2 className="text-lg font-bold text-gray-800 mb-2 text-center">
                     {partnershipData.player1} & {partnershipData.player2}
                   </h2>
+                  <p className="text-sm text-gray-600 text-center mb-4">
+                    Partnership stats for {selectedYear === 'all' ? 'all years' : selectedYear}
+                  </p>
                   
                   {partnershipData.stats && (
                     <div className="grid grid-cols-2 gap-4 mb-6">

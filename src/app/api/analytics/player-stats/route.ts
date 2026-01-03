@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { ensureSchema, sql } from '@/lib/db';
 import { analyticsCache, CACHE_KEYS, CACHE_TTL } from '@/lib/cache';
 
@@ -10,14 +10,24 @@ interface PlayerStats {
   winPercentage: number;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await ensureSchema();
     
+    const searchParams = request.nextUrl.searchParams;
+    const year = searchParams.get('year') || 'all';
+    
     // Check cache first
-    const cachedStats = analyticsCache.get<PlayerStats[]>(CACHE_KEYS.PLAYER_STATS);
+    const cacheKey = `${CACHE_KEYS.PLAYER_STATS}:${year}`;
+    const cachedStats = analyticsCache.get<PlayerStats[]>(cacheKey);
     if (cachedStats) {
       return NextResponse.json(cachedStats);
+    }
+    
+    // Build year filter
+    let yearFilter = sql``;
+    if (year !== 'all') {
+      yearFilter = sql`AND EXTRACT(YEAR FROM t.date::date) = ${parseInt(year)}`;
     }
     
     // Single optimized query to get all player stats at once
@@ -43,6 +53,7 @@ export async function GET() {
           AND m.completed = true 
           AND m.winner_team IS NOT NULL
           AND (m.team_a_p1 = p.id OR m.team_a_p2 = p.id OR m.team_b_p1 = p.id OR m.team_b_p2 = p.id)
+          ${yearFilter}
       )
       SELECT 
         name,
@@ -74,7 +85,7 @@ export async function GET() {
     }));
 
     // Cache the results
-    analyticsCache.set(CACHE_KEYS.PLAYER_STATS, formattedStats, CACHE_TTL);
+    analyticsCache.set(cacheKey, formattedStats, CACHE_TTL);
 
     return NextResponse.json(formattedStats);
   } catch (e: any) {

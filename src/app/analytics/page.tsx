@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ChevronLeftIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 interface PlayerStats {
@@ -22,16 +23,20 @@ interface HeadToHeadRecord {
 }
 
 export default function AnalyticsPage() {
+  const searchParams = useSearchParams();
+  const yearParam = searchParams.get('year');
+  
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
   const [headToHeadData, setHeadToHeadData] = useState<HeadToHeadRecord[]>([]);
   const [loadingHeadToHead, setLoadingHeadToHead] = useState(false);
+  const [selectedYear] = useState<string>(yearParam || new Date().getFullYear().toString());
 
   useEffect(() => {
     const loadPlayerStats = async () => {
       try {
-        const response = await fetch('/api/analytics/player-stats', { cache: 'no-store' });
+        const response = await fetch(`/api/analytics/player-stats?year=${selectedYear}`, { cache: 'no-store' });
         console.log('Analytics API response status:', response.status);
         if (response.ok) {
           const stats = await response.json();
@@ -48,7 +53,7 @@ export default function AnalyticsPage() {
     };
 
     loadPlayerStats();
-  }, []);
+  }, [selectedYear]);
 
   const loadHeadToHeadData = async (playerName: string) => {
     setLoadingHeadToHead(true);
@@ -103,7 +108,7 @@ export default function AnalyticsPage() {
           <div className="mb-6 text-center">
             <h2 className="text-xl font-bold text-gray-800">Player Win-Loss Records</h2>
             <p className="text-gray-600 text-sm">
-              Statistics from all finalized tournaments
+              Statistics for {selectedYear === 'all' ? 'all years' : selectedYear}
             </p>
           </div>
 

@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const player1Name = searchParams.get('player1');
     const player2Name = searchParams.get('player2');
+    const year = searchParams.get('year') || 'all';
 
     // If no players specified, return all unique players
     if (!player1Name || !player2Name) {
@@ -32,10 +33,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Check cache for partnership stats
-    const cacheKey = CACHE_KEYS.PARTNERSHIP_STATS(player1Name, player2Name);
+    const cacheKey = `${CACHE_KEYS.PARTNERSHIP_STATS(player1Name, player2Name)}:${year}`;
     const cachedStats = analyticsCache.get(cacheKey);
     if (cachedStats) {
       return NextResponse.json(cachedStats);
+    }
+
+    // Build year filter
+    let yearFilter = sql``;
+    if (year !== 'all') {
+      yearFilter = sql`AND EXTRACT(YEAR FROM t.date::date) = ${parseInt(year)}`;
     }
 
     // Find all matches where these two players were partners
@@ -70,6 +77,7 @@ export async function GET(request: NextRequest) {
       JOIN players p3 ON m.tournament_id = p3.tournament_id AND m.team_b_p1 = p3.id
       JOIN players p4 ON m.tournament_id = p4.tournament_id AND m.team_b_p2 = p4.id
       WHERE m.completed = true
+        ${yearFilter}
         AND (
           (p1.name = ${player1Name} AND p2.name = ${player2Name}) OR
           (p1.name = ${player2Name} AND p2.name = ${player1Name}) OR
