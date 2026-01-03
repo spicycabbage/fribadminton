@@ -153,7 +153,7 @@ export default function HomePage() {
       {/* Version info */}
       <div className="mt-8 text-center">
         <p className="text-white text-xs opacity-75">
-          Version 1.0
+          Version 1.1
         </p>
       </div>
     </div>
