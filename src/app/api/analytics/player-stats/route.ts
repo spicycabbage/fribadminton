@@ -24,50 +24,85 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedStats);
     }
     
-    // Build year filter
-    let yearFilter = sql``;
-    if (year !== 'all') {
-      yearFilter = sql`AND EXTRACT(YEAR FROM t.date::date) = ${parseInt(year)}`;
-    }
-    
-    // Single optimized query to get all player stats at once
-    const playerStats = await sql<{
-      name: string;
-      wins: number;
-      losses: number;
-      total_matches: number;
-      win_percentage: number;
-    }[]>`
-      WITH player_matches AS (
+    // Build query based on year filter
+    let playerStats;
+    if (year === 'all') {
+      playerStats = await sql<{
+        name: string;
+        wins: number;
+        losses: number;
+        total_matches: number;
+        win_percentage: number;
+      }[]>`
+        WITH player_matches AS (
+          SELECT 
+            p.name,
+            CASE 
+              WHEN (m.team_a_p1 = p.id OR m.team_a_p2 = p.id) AND m.winner_team = 'A' THEN 1
+              WHEN (m.team_b_p1 = p.id OR m.team_b_p2 = p.id) AND m.winner_team = 'B' THEN 1
+              ELSE 0
+            END as is_win
+          FROM players p
+          JOIN tournaments t ON p.tournament_id = t.id
+          JOIN matches m ON p.tournament_id = m.tournament_id
+          WHERE t.is_finalized = true 
+            AND m.completed = true 
+            AND m.winner_team IS NOT NULL
+            AND (m.team_a_p1 = p.id OR m.team_a_p2 = p.id OR m.team_b_p1 = p.id OR m.team_b_p2 = p.id)
+        )
         SELECT 
-          p.name,
+          name,
+          SUM(is_win)::integer as wins,
+          (COUNT(*) - SUM(is_win))::integer as losses,
+          COUNT(*)::integer as total_matches,
           CASE 
-            WHEN (m.team_a_p1 = p.id OR m.team_a_p2 = p.id) AND m.winner_team = 'A' THEN 1
-            WHEN (m.team_b_p1 = p.id OR m.team_b_p2 = p.id) AND m.winner_team = 'B' THEN 1
+            WHEN COUNT(*) > 0 THEN ROUND((SUM(is_win)::float / COUNT(*)) * 100)::integer
             ELSE 0
-          END as is_win
-        FROM players p
-        JOIN tournaments t ON p.tournament_id = t.id
-        JOIN matches m ON p.tournament_id = m.tournament_id
-        WHERE t.is_finalized = true 
-          AND m.completed = true 
-          AND m.winner_team IS NOT NULL
-          AND (m.team_a_p1 = p.id OR m.team_a_p2 = p.id OR m.team_b_p1 = p.id OR m.team_b_p2 = p.id)
-          ${yearFilter}
-      )
-      SELECT 
-        name,
-        SUM(is_win)::integer as wins,
-        (COUNT(*) - SUM(is_win))::integer as losses,
-        COUNT(*)::integer as total_matches,
-        CASE 
-          WHEN COUNT(*) > 0 THEN ROUND((SUM(is_win)::float / COUNT(*)) * 100)::integer
-          ELSE 0
-        END as win_percentage
-      FROM player_matches
-      GROUP BY name
-      ORDER BY win_percentage DESC, total_matches DESC
-    `;
+          END as win_percentage
+        FROM player_matches
+        GROUP BY name
+        ORDER BY win_percentage DESC, total_matches DESC
+      `;
+    } else {
+      const yearInt = parseInt(year);
+      playerStats = await sql<{
+        name: string;
+        wins: number;
+        losses: number;
+        total_matches: number;
+        win_percentage: number;
+      }[]>`
+        WITH player_matches AS (
+          SELECT 
+            p.name,
+            CASE 
+              WHEN (m.team_a_p1 = p.id OR m.team_a_p2 = p.id) AND m.winner_team = 'A' THEN 1
+              WHEN (m.team_b_p1 = p.id OR m.team_b_p2 = p.id) AND m.winner_team = 'B' THEN 1
+              ELSE 0
+            END as is_win
+          FROM players p
+          JOIN tournaments t ON p.tournament_id = t.id
+          JOIN matches m ON p.tournament_id = m.tournament_id
+          WHERE t.is_finalized = true 
+            AND m.completed = true 
+            AND m.winner_team IS NOT NULL
+            AND (m.team_a_p1 = p.id OR m.team_a_p2 = p.id OR m.team_b_p1 = p.id OR m.team_b_p2 = p.id)
+            AND EXTRACT(YEAR FROM t.date::date) = ${yearInt}
+        )
+        SELECT 
+          name,
+          SUM(is_win)::integer as wins,
+          (COUNT(*) - SUM(is_win))::integer as losses,
+          COUNT(*)::integer as total_matches,
+          CASE 
+            WHEN COUNT(*) > 0 THEN ROUND((SUM(is_win)::float / COUNT(*)) * 100)::integer
+            ELSE 0
+          END as win_percentage
+        FROM player_matches
+        GROUP BY name
+        ORDER BY win_percentage DESC, total_matches DESC
+      `;
+    }
 
     // Convert to the expected format
     const formattedStats: PlayerStats[] = playerStats.map((stat: {
