@@ -8,10 +8,11 @@ export default function HomePage() {
   const [checking, setChecking] = useState<boolean>(true);
   const [selectedYear, setSelectedYear] = useState<string>(() => {
     // Initialize from localStorage on mount to avoid flicker
+    // If nothing saved, default to current year
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('selectedYear') || 'all';
+      return localStorage.getItem('selectedYear') || new Date().getFullYear().toString();
     }
-    return 'all';
+    return new Date().getFullYear().toString();
   });
   const [availableYears, setAvailableYears] = useState<string[]>([]);
 
