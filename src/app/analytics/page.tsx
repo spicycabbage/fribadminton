@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ChevronLeftIcon, ChartBarIcon } from '@heroicons/react/24/outline';
@@ -22,7 +22,7 @@ interface HeadToHeadRecord {
   avgMargin: number;
 }
 
-export default function AnalyticsPage() {
+function AnalyticsContent() {
   const searchParams = useSearchParams();
   const yearParam = searchParams.get('year');
   
@@ -258,5 +258,17 @@ export default function AnalyticsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AnalyticsPage() {
+  return (
+    <Suspense fallback={
+      <div className="mobile-container bg-blue-600 min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Loading analytics...</div>
+      </div>
+    }>
+      <AnalyticsContent />
+    </Suspense>
   );
 }

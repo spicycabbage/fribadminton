@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ChevronLeftIcon, TrophyIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { Tournament, getRankedPlayers } from '@/lib/gameLogic';
 
-export default function TournamentResultsPage() {
+function TournamentResultsContent() {
   const searchParams = useSearchParams();
   const yearParam = searchParams.get('year');
   
@@ -183,6 +183,18 @@ export default function TournamentResultsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function TournamentResultsPage() {
+  return (
+    <Suspense fallback={
+      <div className="mobile-container bg-blue-600 min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Loading results...</div>
+      </div>
+    }>
+      <TournamentResultsContent />
+    </Suspense>
   );
 }
 
