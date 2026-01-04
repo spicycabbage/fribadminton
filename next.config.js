@@ -10,7 +10,9 @@ const nextConfig = {
   reactStrictMode: false, // Disable strict mode to prevent double renders
   experimental: {
     optimizePackageImports: ['@heroicons/react']
-  }
+  },
+  // Add empty turbopack config to silence the warning since next-pwa uses webpack
+  turbopack: {}
 };
 
 module.exports = withPWA(nextConfig);
