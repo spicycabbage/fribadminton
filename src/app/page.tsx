@@ -6,7 +6,13 @@ import { useEffect, useState } from 'react';
 export default function HomePage() {
   const [hasActive, setHasActive] = useState<boolean>(false);
   const [checking, setChecking] = useState<boolean>(true);
-  const [selectedYear, setSelectedYear] = useState<string>('');
+  const [selectedYear, setSelectedYear] = useState<string>(() => {
+    // Initialize from localStorage on mount to avoid flicker
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('selectedYear') || 'all';
+    }
+    return 'all';
+  });
   const [availableYears, setAvailableYears] = useState<string[]>([]);
 
   useEffect(() => {
@@ -38,15 +44,9 @@ export default function HomePage() {
           });
           const sortedYears = Array.from(years).sort((a, b) => parseInt(b) - parseInt(a));
           setAvailableYears(sortedYears);
-          
-          // Set default to "all" or saved year
-          const savedYear = localStorage.getItem('selectedYear');
-          setSelectedYear(savedYear || 'all');
         }
       } catch (err) {
         console.error('Failed to fetch years:', err);
-        // Default to "all"
-        setSelectedYear('all');
       }
     };
     fetchYears();
