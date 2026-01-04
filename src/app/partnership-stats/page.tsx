@@ -41,7 +41,7 @@ function PartnershipStatsContent() {
   const [partnershipData, setPartnershipData] = useState<PartnershipData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [selectedYear] = useState<string>(yearParam || new Date().getFullYear().toString());
+  const [selectedYear] = useState<string>(yearParam || 'all');
 
   // Fetch all players on component mount
   useEffect(() => {

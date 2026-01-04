@@ -31,7 +31,7 @@ function AnalyticsContent() {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
   const [headToHeadData, setHeadToHeadData] = useState<HeadToHeadRecord[]>([]);
   const [loadingHeadToHead, setLoadingHeadToHead] = useState(false);
-  const [selectedYear] = useState<string>(yearParam || new Date().getFullYear().toString());
+  const [selectedYear] = useState<string>(yearParam || 'all');
 
   useEffect(() => {
     const loadPlayerStats = async () => {

@@ -14,7 +14,7 @@ function TournamentResultsContent() {
   const [filteredTournaments, setFilteredTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'history' | 'finishes'>('history');
-  const [selectedYear, setSelectedYear] = useState<string>(yearParam || new Date().getFullYear().toString());
+  const [selectedYear, setSelectedYear] = useState<string>(yearParam || 'all');
 
   useEffect(() => {
     const loadTournaments = async () => {

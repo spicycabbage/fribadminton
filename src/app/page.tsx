@@ -39,16 +39,14 @@ export default function HomePage() {
           const sortedYears = Array.from(years).sort((a, b) => parseInt(b) - parseInt(a));
           setAvailableYears(sortedYears);
           
-          // Set default to current year
-          const currentYear = new Date().getFullYear().toString();
+          // Set default to "all" or saved year
           const savedYear = localStorage.getItem('selectedYear');
-          setSelectedYear(savedYear || currentYear);
+          setSelectedYear(savedYear || 'all');
         }
       } catch (err) {
         console.error('Failed to fetch years:', err);
-        // Default to current year
-        const currentYear = new Date().getFullYear().toString();
-        setSelectedYear(currentYear);
+        // Default to "all"
+        setSelectedYear('all');
       }
     };
     fetchYears();
