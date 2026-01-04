@@ -61,7 +61,7 @@ function AnalyticsContent() {
       const response = await fetch('/api/analytics/head-to-head', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ playerName }),
+        body: JSON.stringify({ playerName, year: selectedYear }),
         cache: 'no-store'
       });
       

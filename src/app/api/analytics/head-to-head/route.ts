@@ -14,26 +14,36 @@ interface HeadToHeadRecord {
 export async function POST(req: Request) {
   try {
     await ensureSchema();
-    const { playerName } = await req.json();
+    const { playerName, year } = await req.json();
     
     if (!playerName) {
       return NextResponse.json({ error: 'Player name is required' }, { status: 400 });
     }
     
-    // Clear cache for this fix and check cache
-    const cacheKey = CACHE_KEYS.HEAD_TO_HEAD(playerName);
-    // Temporarily disable cache to ensure fresh data after bug fix
-    // const cachedRecords = analyticsCache.get<HeadToHeadRecord[]>(cacheKey);
-    // if (cachedRecords) {
-    //   return NextResponse.json(cachedRecords);
-    // }
+    const yearFilter = year || 'all';
     
-    // Revert to the original working logic but optimized
-    // Get all finalized tournaments
-    const tournaments = await sql<{ id: string }[]>`
-      SELECT id FROM tournaments 
-      WHERE is_finalized = true
-    `;
+    // Check cache
+    const cacheKey = `${CACHE_KEYS.HEAD_TO_HEAD(playerName)}:${yearFilter}`;
+    const cachedRecords = analyticsCache.get<HeadToHeadRecord[]>(cacheKey);
+    if (cachedRecords) {
+      return NextResponse.json(cachedRecords);
+    }
+    
+    // Get all finalized tournaments (with optional year filter)
+    let tournaments;
+    if (yearFilter === 'all') {
+      tournaments = await sql<{ id: string }[]>`
+        SELECT id FROM tournaments 
+        WHERE is_finalized = true
+      `;
+    } else {
+      const yearInt = parseInt(yearFilter);
+      tournaments = await sql<{ id: string }[]>`
+        SELECT id FROM tournaments 
+        WHERE is_finalized = true
+          AND EXTRACT(YEAR FROM date::date) = ${yearInt}
+      `;
+    }
 
     if (tournaments.length === 0) {
       return NextResponse.json([]);
