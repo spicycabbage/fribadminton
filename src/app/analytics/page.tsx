@@ -33,32 +33,34 @@ function AnalyticsContent() {
   const [loadingHeadToHead, setLoadingHeadToHead] = useState(false);
   const [selectedYear] = useState<string>(yearParam || 'all');
 
-  useEffect(() => {
-    const loadPlayerStats = async () => {
-      try {
-        const response = await fetch(`/api/analytics/player-stats?year=${selectedYear}`, { cache: 'no-store' });
-        console.log('Analytics API response status:', response.status);
-        if (response.ok) {
-          const stats = await response.json();
-          console.log('Analytics data:', stats);
-          setPlayerStats(stats);
-        } else {
-          const errorText = await response.text();
-          console.error('Analytics API error:', response.status, errorText);
-        }
-      } catch (error) {
-        console.error('Failed to load player stats:', error);
+  const loadPlayerStats = async () => {
+    try {
+      // Add timestamp to bypass cache
+      const response = await fetch(`/api/analytics/player-stats?year=${selectedYear}&t=${Date.now()}`, { cache: 'no-store' });
+      console.log('Analytics API response status:', response.status);
+      if (response.ok) {
+        const stats = await response.json();
+        console.log('Analytics data:', stats);
+        setPlayerStats(stats);
+      } else {
+        const errorText = await response.text();
+        console.error('Analytics API error:', response.status, errorText);
       }
-      setLoading(false);
-    };
+    } catch (error) {
+      console.error('Failed to load player stats:', error);
+    }
+    setLoading(false);
+  };
 
+  useEffect(() => {
     loadPlayerStats();
   }, [selectedYear]);
 
   const loadHeadToHeadData = async (playerName: string) => {
     setLoadingHeadToHead(true);
     try {
-      const response = await fetch('/api/analytics/head-to-head', {
+      // Add timestamp to bypass cache
+      const response = await fetch(`/api/analytics/head-to-head?t=${Date.now()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerName, year: selectedYear }),
@@ -106,7 +108,21 @@ function AnalyticsContent() {
       <div className="bg-white mx-[4%] mb-[4%] rounded-b-xl flex-1">
         <div className="p-4">
           <div className="mb-6 text-center">
-            <h2 className="text-xl font-bold text-gray-800">Player Win-Loss Records</h2>
+            <div className="flex items-center justify-center gap-2">
+              <h2 className="text-xl font-bold text-gray-800">Player Win-Loss Records</h2>
+              <button
+                onClick={() => {
+                  setLoading(true);
+                  loadPlayerStats();
+                }}
+                className="text-blue-600 hover:text-blue-800 transition-colors"
+                title="Refresh data"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            </div>
             <p className="text-gray-600 text-sm">
               Statistics for {selectedYear === 'all' ? 'all years' : selectedYear}
             </p>
