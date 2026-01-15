@@ -20,7 +20,7 @@ export default function HomePage() {
     let ignore = false;
     (async () => {
       try {
-        const res = await fetch('/api/tournaments/active', { cache: 'no-store' });
+        const res = await fetch(`/api/tournaments/active?t=${Date.now()}`, { cache: 'no-store' });
         if (!ignore && res.ok) {
           const data = await res.json();
           setHasActive(!!data?.active);

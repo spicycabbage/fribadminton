@@ -53,7 +53,10 @@ export default function JoinTournamentPage() {
 
       // Also try API path to find active by code in case socket memory was reset
       try {
-        const apiRes = await fetch(`/api/tournaments/by-code/${encodeURIComponent(accessCode)}`, { cache: 'no-store' });
+        const apiRes = await fetch(
+          `/api/tournaments/by-code/${encodeURIComponent(accessCode)}?t=${Date.now()}`,
+          { cache: 'no-store' }
+        );
         if (apiRes.ok) {
           const t = await apiRes.json();
           try { localStorage.setItem('currentTournament', JSON.stringify(t)); } catch {}

@@ -31,6 +31,10 @@ const withPWA = require('next-pwa')({
       }
     },
     {
+      urlPattern: /\/api\/tournaments\/.*/i,
+      handler: 'NetworkOnly'
+    },
+    {
       urlPattern: /\/api\/.*/i,
       handler: 'NetworkFirst',
       options: {
