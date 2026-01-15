@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getSocket } from '@/lib/socket';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -9,8 +9,30 @@ import { ChevronLeftIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 export default function JoinTournamentPage() {
   const router = useRouter();
   const [accessCode, setAccessCode] = useState('123');
+  const [activeTournamentId, setActiveTournamentId] = useState<string | null>(null);
+  const [activeAccessCode, setActiveAccessCode] = useState<string | null>(null);
+  const [hasEditedCode, setHasEditedCode] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/tournaments/active?t=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data?.active || !data?.tournament) return;
+        if (ignore) return;
+        setActiveTournamentId(data.tournament.id);
+        setActiveAccessCode(data.tournament.access_code);
+        if (!hasEditedCode && data.tournament.access_code) {
+          setAccessCode(data.tournament.access_code);
+        }
+      } catch {}
+    })();
+    return () => { ignore = true; };
+  }, [hasEditedCode]);
 
   const handleJoinTournament = async () => {
     setLoading(true);
@@ -51,6 +73,23 @@ export default function JoinTournamentPage() {
         setLoading(false);
       });
 
+      // If active tournament is known and code matches, join directly via API
+      if (activeTournamentId && activeAccessCode && accessCode === activeAccessCode) {
+        try {
+          const activeRes = await fetch(
+            `/api/tournaments/${encodeURIComponent(activeTournamentId)}?t=${Date.now()}`,
+            { cache: 'no-store' }
+          );
+          if (activeRes.ok) {
+            const t = await activeRes.json();
+            clearTimeout(timeoutId);
+            try { localStorage.setItem('currentTournament', JSON.stringify(t)); } catch {}
+            router.push(`/tournament/${t.id}`);
+            return;
+          }
+        } catch {}
+      }
+
       // Also try API path to find active by code in case socket memory was reset
       try {
         const apiRes = await fetch(
@@ -59,8 +98,15 @@ export default function JoinTournamentPage() {
         );
         if (apiRes.ok) {
           const t = await apiRes.json();
+          clearTimeout(timeoutId);
           try { localStorage.setItem('currentTournament', JSON.stringify(t)); } catch {}
           router.push(`/tournament/${t.id}`);
+          return;
+        }
+        if (apiRes.status === 404) {
+          clearTimeout(timeoutId);
+          setError('No active tournament found for that access code.');
+          setLoading(false);
           return;
         }
       } catch {}
@@ -103,7 +149,10 @@ export default function JoinTournamentPage() {
             <input
               type="text"
               value={accessCode}
-              onChange={(e) => setAccessCode(e.target.value.trim())}
+              onChange={(e) => {
+                setHasEditedCode(true);
+                setAccessCode(e.target.value.trim());
+              }}
               placeholder="Enter access code"
               className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center font-mono text-lg"
               maxLength={6}
