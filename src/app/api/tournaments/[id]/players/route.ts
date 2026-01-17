@@ -5,15 +5,22 @@ import { assembleTournament } from '@/lib/tournamentRepo';
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    console.log('[Players API] Tournament ID from params:', id);
+    
     await ensureSchema();
     
     // Verify tournament exists first
     const [tournament] = await sql`select id from tournaments where id=${id} limit 1`;
+    console.log('[Players API] Tournament lookup result:', tournament);
+    
     if (!tournament) {
+      console.error('[Players API] Tournament not found in database, id:', id);
       return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
     }
 
     const { playerNames } = await req.json();
+    console.log('[Players API] Player names to update:', playerNames);
+    
     if (!Array.isArray(playerNames) || playerNames.length !== 8) {
       return NextResponse.json({ error: 'Invalid playerNames' }, { status: 400 });
     }
