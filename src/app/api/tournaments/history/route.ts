@@ -53,7 +53,7 @@ export async function GET() {
     });
 
     // Build tournaments
-    const tournaments: Tournament[] = rows.map(tr => {
+    const tournaments: Tournament[] = rows.map((tr: DbTournamentRow) => {
       const players = playersByTournament.get(tr.id) || [];
       const matches = matchesByTournament.get(tr.id) || [];
 
