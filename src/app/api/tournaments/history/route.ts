@@ -18,7 +18,7 @@ export async function GET() {
       return NextResponse.json([]);
     }
 
-    const tournamentIds = rows.map(r => r.id);
+    const tournamentIds = rows.map((r: DbTournamentRow) => r.id);
 
     // Batch load all players and matches for these tournaments (2 queries instead of N*2)
     const [allPlayers, allMatches] = await Promise.all([
