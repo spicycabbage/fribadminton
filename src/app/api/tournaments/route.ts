@@ -10,6 +10,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
+    // Auto-finalize tournaments older than 24 hours
+    await sql`
+      update tournaments 
+      set is_finalized = true 
+      where is_finalized = false 
+      and created_at < now() - interval '24 hours'
+    `;
+
     // Enforce only one active tournament at a time
     const active = await sql<{ c: number }[]>`select count(*)::int as c from tournaments where is_finalized=false`;
     if ((active[0]?.c || 0) > 0) {
