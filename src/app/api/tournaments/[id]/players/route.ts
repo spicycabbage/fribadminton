@@ -6,6 +6,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   try {
     const { id } = await params;
     await ensureSchema();
+    
+    // Verify tournament exists first
+    const [tournament] = await sql`select id from tournaments where id=${id} limit 1`;
+    if (!tournament) {
+      return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
+    }
+
     const { playerNames } = await req.json();
     if (!Array.isArray(playerNames) || playerNames.length !== 8) {
       return NextResponse.json({ error: 'Invalid playerNames' }, { status: 400 });
@@ -18,8 +25,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     const updated = await assembleTournament(id);
+    if (!updated) {
+      return NextResponse.json({ error: 'Failed to fetch updated tournament' }, { status: 500 });
+    }
     return NextResponse.json(updated);
   } catch (e: any) {
+    console.error('Error updating players:', e);
     return NextResponse.json({ error: e.message || 'Server error' }, { status: 500 });
   }
 }

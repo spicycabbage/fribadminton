@@ -181,7 +181,12 @@ export default function TournamentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerNames: updatedPlayers }),
       });
-      if (!res.ok) throw new Error('Failed to update players');
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Failed to update players:', res.status, errorData);
+        alert(`Failed to update players: ${errorData.error || 'Unknown error'}`);
+        return;
+      }
       const updated = await res.json();
       setTournament(updated);
       try { localStorage.setItem('currentTournament', JSON.stringify(updated)); } catch {}
@@ -190,7 +195,8 @@ export default function TournamentPage() {
         socket.emit('tournament:update', { tournament: updated });
       } catch {}
     } catch (e) {
-      // Optimistic: keep local names even if API fails silently, but do nothing extra here
+      console.error('Error updating players:', e);
+      alert('Failed to update players. Please try again.');
     }
   };
 
