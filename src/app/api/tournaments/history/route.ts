@@ -38,14 +38,14 @@ export async function GET() {
     const playersByTournament = new Map<string, typeof allPlayers>();
     const matchesByTournament = new Map<string, typeof allMatches>();
     
-    allPlayers.forEach(p => {
+    allPlayers.forEach((p: { tournament_id: string; id: number; name: string; total_score: number }) => {
       if (!playersByTournament.has(p.tournament_id)) {
         playersByTournament.set(p.tournament_id, []);
       }
       playersByTournament.get(p.tournament_id)!.push(p);
     });
 
-    allMatches.forEach(m => {
+    allMatches.forEach((m: { tournament_id: string; id: number; round: number; team_a_p1: number; team_a_p2: number; team_b_p1: number; team_b_p2: number; score_a: number | null; score_b: number | null; completed: boolean; winner_team?: string | null }) => {
       if (!matchesByTournament.has(m.tournament_id)) {
         matchesByTournament.set(m.tournament_id, []);
       }
@@ -59,7 +59,7 @@ export async function GET() {
 
       // Build per-player, per-round scores from matches
       const playerScoresByRound: Record<number, number[]> = {};
-      players.forEach(p => { playerScoresByRound[p.id] = new Array(7).fill(0); });
+      players.forEach((p: { id: number }) => { playerScoresByRound[p.id] = new Array(7).fill(0); });
       
       for (const m of matches) {
         const r = Math.max(1, Math.min(7, Number(m.round || 1))) - 1;
@@ -77,12 +77,12 @@ export async function GET() {
         id: tr.id,
         accessCode: tr.access_code,
         date: tr.date,
-        players: players.map(p => {
+        players: players.map((p: { id: number; name: string; total_score: number }) => {
           const scores = playerScoresByRound[p.id] || new Array(7).fill(0);
-          const calculatedTotal = scores.reduce((sum, score) => sum + score, 0);
+          const calculatedTotal = scores.reduce((sum: number, score: number) => sum + score, 0);
           return { id: p.id, name: p.name, scores, totalScore: calculatedTotal };
         }),
-        matches: matches.map(m => ({
+        matches: matches.map((m: { id: number; round: number; team_a_p1: number; team_a_p2: number; team_b_p1: number; team_b_p2: number; score_a: number | null; score_b: number | null; completed: boolean; winner_team?: string | null }) => ({
           id: m.id,
           round: m.round,
           teamA: { player1: m.team_a_p1, player2: m.team_a_p2 },
